@@ -48,7 +48,7 @@ export default function LivePreview() {
           }}
         >
           {/* Inner Content Wrapper */}
-          <div className="bg-surface border border-border/50 shadow-sm w-full min-h-[400px] flex items-center justify-center overflow-x-hidden">
+          <div className="relative bg-surface border border-border/50 shadow-sm w-full min-h-[400px] flex items-center justify-center overflow-x-hidden">
             <PreviewComponents />
           </div>
         </div>
