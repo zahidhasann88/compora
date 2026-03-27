@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 
-export type ComponentType = 'button' | 'card' | 'input' | 'badge' | 'avatar' | 'select' | 'checkbox' | 'alert' | 'modal' | 'tabs' | 'navbar' | 'toast';
+export type ComponentType = 'button' | 'card' | 'input' | 'badge' | 'avatar' | 'select' | 'checkbox' | 'alert' | 'modal' | 'tabs' | 'navbar' | 'toast' | 'table' | 'dropdown' | 'command' | 'datepicker';
 export type Variant = 'primary' | 'secondary' | 'outline';
 export type Device = 'mobile' | 'tablet' | 'desktop';
 
@@ -14,12 +14,21 @@ export interface Styles {
   fontSize: string;
 }
 
+export interface HistoryState {
+  selectedComponent: ComponentType;
+  styles: Styles;
+  variant: Variant;
+}
+
 interface PlaygroundState {
   selectedComponent: ComponentType;
   styles: Styles;
   variant: Variant;
   device: Device;
   theme: 'light' | 'dark';
+  past: HistoryState[];
+  future: HistoryState[];
+
   setComponent: (component: ComponentType) => void;
   updateStyle: (key: keyof Styles, value: string) => void;
   setVariant: (variant: Variant) => void;
@@ -29,6 +38,10 @@ interface PlaygroundState {
   toQueryString: () => string;
   saveToLocalStorage: () => void;
   loadFromLocalStorage: () => void;
+  
+  saveHistory: () => void;
+  undo: () => void;
+  redo: () => void;
 }
 
 const defaultStyles: Styles = {
@@ -45,15 +58,63 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
   variant: 'primary',
   device: 'desktop',
   theme: 'dark',
+  past: [],
+  future: [],
 
-  setComponent: (component) => set({ selectedComponent: component }),
+  saveHistory: () => {
+    const { selectedComponent, styles, variant, past } = get();
+    // Only save if last state is different (shallow check avoiding duplicates)
+    set({
+      past: [...past, { selectedComponent, styles: { ...styles }, variant }],
+      future: [], // clear future on new actions
+    });
+  },
 
-  updateStyle: (key, value) =>
-    set((state) => ({
-      styles: { ...state.styles, [key]: value },
-    })),
+  undo: () => {
+    const { past, future, selectedComponent, styles, variant } = get();
+    if (past.length === 0) return;
+    
+    const previous = past[past.length - 1];
+    const newPast = past.slice(0, past.length - 1);
+    
+    set({
+      past: newPast,
+      future: [{ selectedComponent, styles: { ...styles }, variant }, ...future],
+      selectedComponent: previous.selectedComponent,
+      styles: previous.styles,
+      variant: previous.variant,
+    });
+  },
 
-  setVariant: (variant) => set({ variant }),
+  redo: () => {
+    const { past, future, selectedComponent, styles, variant } = get();
+    if (future.length === 0) return;
+    
+    const next = future[0];
+    const newFuture = future.slice(1);
+    
+    set({
+      past: [...past, { selectedComponent, styles: { ...styles }, variant }],
+      future: newFuture,
+      selectedComponent: next.selectedComponent,
+      styles: next.styles,
+      variant: next.variant,
+    });
+  },
+
+  setComponent: (component) => {
+    get().saveHistory();
+    set({ selectedComponent: component });
+  },
+
+  updateStyle: (key, value) => set((state) => ({
+    styles: { ...state.styles, [key]: value },
+  })),
+
+  setVariant: (variant) => {
+    get().saveHistory();
+    set({ variant });
+  },
 
   setDevice: (device) => set({ device }),
 

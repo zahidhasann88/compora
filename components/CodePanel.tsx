@@ -3,7 +3,7 @@
 import React, { useState, useCallback } from 'react';
 import { usePlaygroundStore } from '@/store/usePlaygroundStore';
 import { generateCode } from '@/lib/codeGenerator';
-import { Copy, Check } from 'lucide-react';
+import { Copy, Check, Download } from 'lucide-react';
 
 type Token = { text: string; color?: string };
 
@@ -106,6 +106,7 @@ function highlightJSX(code: string): React.ReactNode[] {
 export default function CodePanel() {
   const { selectedComponent, styles, variant } = usePlaygroundStore();
   const [copied, setCopied] = useState(false);
+  const [downloaded, setDownloaded] = useState(false);
 
   const code = generateCode(selectedComponent, styles, variant);
 
@@ -126,6 +127,24 @@ export default function CodePanel() {
     }
   }, [code]);
 
+  const handleDownload = useCallback(() => {
+    const componentName = selectedComponent.charAt(0).toUpperCase() + selectedComponent.slice(1);
+    const fileContent = `import React from 'react';\n\nexport default function ${componentName}Component() {\n  return (\n    ${code.split('\\n').join('\\n    ')}\n  );\n}\n`;
+    
+    const blob = new Blob([fileContent], { type: 'text/javascript' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${componentName}Component.tsx`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    setDownloaded(true);
+    setTimeout(() => setDownloaded(false), 2000);
+  }, [code, selectedComponent]);
+
   return (
     <div className="glass-panel overflow-hidden">
       {/* Header */}
@@ -138,32 +157,60 @@ export default function CodePanel() {
             JSX + Tailwind
           </span>
         </div>
-        <button
-          id="copy-code-btn"
-          onClick={handleCopy}
-          title="Copy code"
-          className={`
-            flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium
-            transition-all duration-200 cursor-pointer
-            ${
-              copied
-                ? 'bg-emerald-500/15 text-emerald-400'
-                : 'bg-surface-hover text-muted hover:text-foreground'
-            }
-          `}
-        >
-          {copied ? (
-            <>
-              <Check size={14} />
-              Copied!
-            </>
-          ) : (
-            <>
-              <Copy size={14} />
-              Copy
-            </>
-          )}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            id="download-code-btn"
+            onClick={handleDownload}
+            title="Download React Component"
+            className={`
+              flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium
+              transition-all duration-200 cursor-pointer
+              ${
+                downloaded
+                  ? 'bg-emerald-500/15 text-emerald-400'
+                  : 'bg-surface-hover text-muted hover:text-foreground border border-border'
+              }
+            `}
+          >
+            {downloaded ? (
+              <>
+                <Check size={14} />
+                Saved!
+              </>
+            ) : (
+              <>
+                <Download size={14} />
+                Export
+              </>
+            )}
+          </button>
+          <button
+            id="copy-code-btn"
+            onClick={handleCopy}
+            title="Copy code"
+            className={`
+              flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium
+              transition-all duration-200 cursor-pointer
+              ${
+                copied
+                  ? 'bg-emerald-500/15 text-emerald-400'
+                  : 'bg-accent text-white hover:bg-accent/90 shadow-md'
+              }
+            `}
+          >
+            {copied ? (
+              <>
+                <Check size={14} />
+                Copied!
+              </>
+            ) : (
+              <>
+                <Copy size={14} />
+                Copy
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Code */}

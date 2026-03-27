@@ -228,6 +228,61 @@ function getToastStyles(styles: Styles, variant: Variant, theme: 'light' | 'dark
   }
 }
 
+function getTableStyles(styles: Styles, variant: Variant, theme: 'light' | 'dark'): CSSProperties {
+  return {
+    borderRadius: `${styles.borderRadius}px`,
+    width: '100%',
+    maxWidth: '600px',
+    border: `1px solid ${theme === 'dark' ? '#1e293b' : '#e2e8f0'}`,
+    overflow: 'hidden',
+  };
+}
+
+function getDropdownStyles(styles: Styles, variant: Variant, theme: 'light' | 'dark'): CSSProperties {
+  const isWhiteText = styles.textColor.toLowerCase() === '#ffffff';
+  const textColor = isWhiteText && theme === 'light' ? '#0f172a' : styles.textColor;
+  
+  return {
+    borderRadius: `${styles.borderRadius}px`,
+    width: '224px',
+    border: `1px solid ${theme === 'dark' ? '#1e293b' : '#e2e8f0'}`,
+    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+    backgroundColor: theme === 'dark' ? '#020617' : '#ffffff',
+    color: textColor,
+  };
+}
+
+function getCommandStyles(styles: Styles, variant: Variant, theme: 'light' | 'dark'): CSSProperties {
+  const isWhiteText = styles.textColor.toLowerCase() === '#ffffff';
+  const textColor = isWhiteText && theme === 'light' ? '#0f172a' : styles.textColor;
+
+  return {
+    borderRadius: `${styles.borderRadius}px`,
+    width: '100%',
+    maxWidth: '400px',
+    border: `1px solid ${theme === 'dark' ? '#1e293b' : '#e2e8f0'}`,
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+    overflow: 'hidden',
+    backgroundColor: theme === 'dark' ? '#020617' : '#ffffff',
+    color: textColor,
+  };
+}
+
+function getDatepickerStyles(styles: Styles, variant: Variant, theme: 'light' | 'dark'): CSSProperties {
+  const isWhiteText = styles.textColor.toLowerCase() === '#ffffff';
+  const textColor = isWhiteText && theme === 'light' ? '#0f172a' : styles.textColor;
+
+  return {
+    borderRadius: `${styles.borderRadius}px`,
+    padding: '12px',
+    display: 'inline-block',
+    border: `1px solid ${theme === 'dark' ? '#1e293b' : '#e2e8f0'}`,
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+    backgroundColor: theme === 'dark' ? '#020617' : '#ffffff',
+    color: textColor,
+  };
+}
+
 export default function PreviewComponents() {
   const { selectedComponent, styles, variant, theme } = usePlaygroundStore();
 
@@ -439,6 +494,118 @@ export default function PreviewComponents() {
             <p style={{ margin: 0, opacity: 0.9, fontSize: '0.875rem' }}>A new software version is ready.</p>
           </div>
           <span style={{ opacity: 0.5, cursor: 'pointer', flexShrink: 0 }}>&times;</span>
+        </div>
+      )}
+
+      {selectedComponent === 'table' && (
+        <div style={getTableStyles(styles, variant, theme)} className="animate-fade-in">
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem', textAlign: 'left' }}>
+            <thead style={{ backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)', borderBottom: `1px solid ${theme === 'dark' ? '#1e293b' : '#e2e8f0'}` }}>
+              <tr>
+                <th style={{ padding: '12px 16px', fontWeight: 500, color: theme === 'dark' ? '#94a3b8' : '#64748b' }}>Invoice</th>
+                <th style={{ padding: '12px 16px', fontWeight: 500, color: theme === 'dark' ? '#94a3b8' : '#64748b' }}>Status</th>
+                <th style={{ padding: '12px 16px', fontWeight: 500, color: theme === 'dark' ? '#94a3b8' : '#64748b' }}>Method</th>
+                <th style={{ padding: '12px 16px', fontWeight: 500, color: theme === 'dark' ? '#94a3b8' : '#64748b', textAlign: 'right' }}>Amount</th>
+              </tr>
+            </thead>
+            <tbody style={{ color: (isWhiteText && theme === 'light') ? '#0f172a' : styles.textColor }}>
+              <tr style={{ borderBottom: `1px solid ${theme === 'dark' ? '#1e293b' : '#e2e8f0'}` }}>
+                <td style={{ padding: '16px', fontWeight: 500 }}>INV001</td>
+                <td style={{ padding: '16px' }}>Paid</td>
+                <td style={{ padding: '16px' }}>Credit Card</td>
+                <td style={{ padding: '16px', textAlign: 'right' }}>$250.00</td>
+              </tr>
+              <tr>
+                <td style={{ padding: '16px', fontWeight: 500 }}>INV002</td>
+                <td style={{ padding: '16px' }}>Pending</td>
+                <td style={{ padding: '16px' }}>PayPal</td>
+                <td style={{ padding: '16px', textAlign: 'right' }}>$150.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {selectedComponent === 'dropdown' && (
+        <div className="flex flex-col items-center animate-fade-in">
+          <button style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            height: '36px', padding: '0 16px', fontSize: '0.875rem', fontWeight: 500,
+            borderRadius: `${styles.borderRadius}px`,
+            border: `1px solid ${theme === 'dark' ? '#1e293b' : '#e2e8f0'}`,
+            backgroundColor: theme === 'dark' ? '#0f172a' : '#ffffff',
+            color: (isWhiteText && theme === 'light') ? '#0f172a' : styles.textColor,
+            marginBottom: '8px'
+          }}>
+            Options
+            <svg style={{ marginLeft: '8px', opacity: 0.5 }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div style={getDropdownStyles(styles, variant, theme)}>
+            <div style={{ padding: '4px' }}>
+              <div style={{ padding: '8px', fontSize: '0.875rem', borderRadius: `${Math.max(2, Number(styles.borderRadius) - 2)}px`, cursor: 'pointer', opacity: 0.9 }}>Edit</div>
+              <div style={{ padding: '8px', fontSize: '0.875rem', borderRadius: `${Math.max(2, Number(styles.borderRadius) - 2)}px`, cursor: 'pointer', opacity: 0.9 }}>Duplicate</div>
+            </div>
+            <div style={{ borderTop: `1px solid ${theme === 'dark' ? '#1e293b' : '#e2e8f0'}`, padding: '4px' }}>
+              <div style={{ padding: '8px', fontSize: '0.875rem', borderRadius: `${Math.max(2, Number(styles.borderRadius) - 2)}px`, cursor: 'pointer', color: theme === 'dark' ? '#f87171' : '#dc2626' }}>Delete</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {selectedComponent === 'command' && (
+        <div style={getCommandStyles(styles, variant, theme)} className="animate-fade-in">
+          <div style={{ 
+            display: 'flex', alignItems: 'center', padding: '0 12px',
+            borderBottom: `1px solid ${theme === 'dark' ? '#1e293b' : '#e2e8f0'}`
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5, marginRight: '8px' }}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" placeholder="Type a command or search..." style={{
+              flex: 1, height: '44px', background: 'transparent', border: 'none', outline: 'none',
+              fontSize: '0.875rem', color: 'inherit'
+            }} readOnly />
+          </div>
+          <div style={{ padding: '4px', maxHeight: '300px', overflowY: 'auto' }}>
+            <div style={{ padding: '8px 8px 4px 8px', fontSize: '0.75rem', fontWeight: 500, color: theme === 'dark' ? '#94a3b8' : '#64748b' }}>Suggestions</div>
+            <div style={{ padding: '8px', fontSize: '0.875rem', borderRadius: `${Math.max(2, Number(styles.borderRadius) - 2)}px`, cursor: 'pointer', opacity: 0.9 }}>Calendar</div>
+            <div style={{ padding: '8px', fontSize: '0.875rem', borderRadius: `${Math.max(2, Number(styles.borderRadius) - 2)}px`, cursor: 'pointer', opacity: 0.9 }}>Search Emoji</div>
+            <div style={{ 
+              padding: '8px', fontSize: '0.875rem', borderRadius: `${Math.max(2, Number(styles.borderRadius) - 2)}px`, cursor: 'pointer',
+              backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'
+            }}>Calculator</div>
+          </div>
+        </div>
+      )}
+
+      {selectedComponent === 'datepicker' && (
+        <div className="animate-fade-in" style={getDatepickerStyles(styles, variant, theme)}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', padding: '0 4px' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5, cursor: 'pointer' }}><path d="m15 18-6-6 6-6"/></svg>
+            <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>October 2026</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5, cursor: 'pointer' }}><path d="m9 18 6-6-6-6"/></svg>
+          </div>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
+                  <th key={day} style={{ width: '36px', fontWeight: 400, fontSize: '0.8rem', color: theme === 'dark' ? '#94a3b8' : '#64748b', paddingBottom: '8px' }}>{day}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                {[27, 28, 29, 30].map(day => <td key={'prev'+day} style={{ textAlign: 'center', opacity: 0.3, fontSize: '0.875rem', height: '36px' }}>{day}</td>)}
+                {[1, 2, 3].map(day => <td key={'cur'+day} style={{ textAlign: 'center', fontSize: '0.875rem', height: '36px' }}>{day}</td>)}
+              </tr>
+              <tr>
+                {[4, 5, 6, 7, 8, 9].map(day => <td key={'cur'+day} style={{ textAlign: 'center', fontSize: '0.875rem', height: '36px' }}>{day}</td>)}
+                <td style={{ 
+                  textAlign: 'center', fontSize: '0.875rem', height: '36px',
+                  backgroundColor: styles.bgColor, color: '#ffffff',
+                  borderRadius: `${Math.max(2, Number(styles.borderRadius) - 2)}px`
+                }}>10</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       )}
     </div>

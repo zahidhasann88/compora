@@ -2,10 +2,10 @@
 
 import { useState, useCallback } from 'react';
 import { usePlaygroundStore } from '@/store/usePlaygroundStore';
-import { Share2, Check, Save } from 'lucide-react';
+import { Share2, Check, Save, Undo2, Redo2 } from 'lucide-react';
 
 export default function ActionBar() {
-  const { toQueryString, saveToLocalStorage } = usePlaygroundStore();
+  const { toQueryString, saveToLocalStorage, undo, redo, past, future } = usePlaygroundStore();
   const [shareState, setShareState] = useState<'idle' | 'copied'>('idle');
   const [saveState, setSaveState] = useState<'idle' | 'saved'>('idle');
 
@@ -25,6 +25,25 @@ export default function ActionBar() {
 
   return (
     <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 bg-surface px-1 py-1 rounded-lg border border-border mr-2">
+        <button
+          onClick={undo}
+          disabled={past.length === 0}
+          title="Undo"
+          className="p-1.5 rounded-md text-muted hover:text-foreground hover:bg-accent/10 disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-all"
+        >
+          <Undo2 size={16} />
+        </button>
+        <button
+          onClick={redo}
+          disabled={future.length === 0}
+          title="Redo"
+          className="p-1.5 rounded-md text-muted hover:text-foreground hover:bg-accent/10 disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-all"
+        >
+          <Redo2 size={16} />
+        </button>
+      </div>
+
       <button
         id="save-btn"
         onClick={handleSave}
