@@ -259,9 +259,9 @@ export function generateSelectCode(styles: Styles, variant: Variant): string {
   // Adding a custom dropdown arrow with a background image would be too long, using an icon wrapper in JSX is common
   return `<div className="relative w-full">
   <select className="${classes}">
-    <option>Option 1</option>
-    <option>Option 2</option>
-    <option>Option 3</option>
+    <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Option 1</option>
+    <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Option 2</option>
+    <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Option 3</option>
   </select>
   <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none opacity-50">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
@@ -333,6 +333,129 @@ export function generateAlertCode(styles: Styles, variant: Variant): string {
 </div>`;
 }
 
+export function generateModalCode(styles: Styles, variant: Variant): string {
+  const radius = mapBorderRadius(styles.borderRadius);
+  const padding = mapPadding(styles.padding);
+  
+  const isWhiteText = styles.textColor.toLowerCase() === '#ffffff';
+  const textColor = isWhiteText ? 'text-slate-900 dark:text-white' : mapTextColor(styles.textColor);
+  const activeBg = mapBgColor(styles.bgColor);
+
+  let classes: string;
+  switch (variant) {
+    case 'primary':
+      classes = `bg-white dark:bg-slate-950 ${textColor} ${padding} ${radius}`;
+      break;
+    case 'secondary':
+      classes = `bg-slate-50 dark:bg-slate-900 ${textColor} ${padding} ${radius}`;
+      break;
+    case 'outline':
+      classes = `bg-white dark:bg-slate-950 border-2 ${mapBorderColor(styles.bgColor)} ${textColor} ${padding} ${radius}`;
+      break;
+  }
+
+  return `<div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+  <div className="${classes} w-full max-w-md shadow-xl">
+    <div className="flex justify-between items-center mb-4">
+      <h3 className="text-lg font-semibold">Modal Title</h3>
+      <button className="opacity-50 hover:opacity-100 transition-opacity text-xl leading-none">&times;</button>
+    </div>
+    <p className="opacity-80 mb-6 text-sm">This is the modal body content. You can place forms or information here.</p>
+    <div className="flex justify-end gap-3">
+      <button className="px-4 py-2 rounded-md font-medium text-sm hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Cancel</button>
+      <button className="px-4 py-2 ${activeBg} text-white rounded-md font-medium text-sm hover:opacity-90 transition-opacity">Confirm</button>
+    </div>
+  </div>
+</div>`;
+}
+
+export function generateTabsCode(styles: Styles, variant: Variant): string {
+  const radius = mapBorderRadius(styles.borderRadius);
+  const activeBg = mapBgColor(styles.bgColor);
+  const isWhiteText = styles.textColor.toLowerCase() === '#ffffff';
+  const textColor = isWhiteText ? 'text-slate-900 dark:text-white' : mapTextColor(styles.textColor);
+
+  return `<div className="w-full max-w-md">
+  <div className="flex p-1 gap-1 bg-slate-100 dark:bg-slate-800/50 ${radius}">
+    <button className="flex-1 py-1.5 px-3 ${activeBg} text-white shadow-sm ${radius} font-medium text-sm transition-all">Account</button>
+    <button className="flex-1 py-1.5 px-3 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium text-sm transition-all rounded-md">Password</button>
+    <button className="flex-1 py-1.5 px-3 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium text-sm transition-all rounded-md">Settings</button>
+  </div>
+  <div className="p-4 mt-2 ${textColor}">
+    <h3 className="font-semibold mb-1">Account Info</h3>
+    <p className="text-sm opacity-80">Make changes to your account here.</p>
+  </div>
+</div>`;
+}
+
+export function generateNavbarCode(styles: Styles, variant: Variant): string {
+  const padding = mapPaddingXY(styles.padding);
+  const activeBg = mapBgColor(styles.bgColor);
+  const isWhiteText = styles.textColor.toLowerCase() === '#ffffff';
+  const textColor = isWhiteText ? 'text-slate-900 dark:text-white' : mapTextColor(styles.textColor);
+  const radius = mapBorderRadius(styles.borderRadius);
+  
+  return `<nav className="w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+  <div className="flex h-14 items-center ${padding} w-full max-w-7xl mx-auto">
+    <div className="mr-4 hidden md:flex">
+      <a className="mr-6 flex items-center space-x-2" href="#">
+        <div className="w-6 h-6 rounded-full ${activeBg}"></div>
+        <span className="hidden font-bold sm:inline-block ${textColor}">Brand</span>
+      </a>
+      <nav className="flex items-center space-x-6 text-sm font-medium">
+        <a className="transition-colors hover:text-foreground/80 ${textColor}" href="#">Products</a>
+        <a className="transition-colors hover:text-foreground/80 text-foreground/60" href="#">Pricing</a>
+        <a className="transition-colors hover:text-foreground/80 text-foreground/60" href="#">About</a>
+      </nav>
+    </div>
+    <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+      <div className="w-full flex-1 md:w-auto md:flex-none">
+        <button className="inline-flex items-center justify-center rounded-md font-medium transition-colors border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-full md:w-40 lg:w-64 text-sm text-muted-foreground justify-start">
+           Search...
+        </button>
+      </div>
+      <button className="inline-flex items-center justify-center ${radius} ${activeBg} text-white h-9 px-4 py-2 font-medium hover:opacity-90 text-sm">Sign In</button>
+    </div>
+  </div>
+</nav>`;
+}
+
+export function generateToastCode(styles: Styles, variant: Variant): string {
+  const radius = mapBorderRadius(styles.borderRadius);
+  const padding = mapPadding(styles.padding);
+  const bg = mapBgColor(styles.bgColor);
+  const isWhiteText = styles.textColor.toLowerCase() === '#ffffff';
+  const textColor = isWhiteText ? 'text-slate-900 dark:text-white' : mapTextColor(styles.textColor);
+
+  let classes: string;
+  switch (variant) {
+    case 'primary':
+      classes = `${bg} text-white`;
+      break;
+    case 'secondary':
+      classes = `bg-white dark:bg-slate-900 border ${mapBorderColor(styles.bgColor)} ${textColor}`;
+      break;
+    case 'outline':
+      classes = `bg-transparent border-2 ${mapBorderColor(styles.bgColor)} ${textColor}`;
+      break;
+  }
+
+  return `<div className="fixed bottom-4 right-4 ${classes} ${padding} ${radius} shadow-lg flex items-center gap-3 min-w-[300px] animate-in slide-in-from-bottom-5 z-50">
+  <svg className="w-5 h-5 opacity-80 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+  <div className="flex-1">
+    <h3 className="font-semibold text-sm">Update available</h3>
+    <p className="text-sm opacity-90">A new software version is ready.</p>
+  </div>
+  <button className="opacity-70 hover:opacity-100 transition-opacity shrink-0">
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  </button>
+</div>`;
+}
+
 export function generateCode(
   component: string,
   styles: Styles,
@@ -355,6 +478,14 @@ export function generateCode(
       return generateCheckboxCode(styles, variant);
     case 'alert':
       return generateAlertCode(styles, variant);
+    case 'modal':
+      return generateModalCode(styles, variant);
+    case 'tabs':
+      return generateTabsCode(styles, variant);
+    case 'navbar':
+      return generateNavbarCode(styles, variant);
+    case 'toast':
+      return generateToastCode(styles, variant);
     default:
       return '';
   }

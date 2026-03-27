@@ -1,7 +1,7 @@
 'use client';
 
 import { usePlaygroundStore, type ComponentType } from '@/store/usePlaygroundStore';
-import { RectangleHorizontal, CreditCard, TextCursorInput, Tag, User, List, CheckSquare, AlertCircle } from 'lucide-react';
+import { RectangleHorizontal, CreditCard, TextCursorInput, Tag, User, List, CheckSquare, AlertCircle, AppWindow, Layout, Navigation, MessageSquare } from 'lucide-react';
 
 const components: { id: ComponentType; label: string; icon: React.ReactNode }[] = [
   { id: 'button', label: 'Button', icon: <RectangleHorizontal size={20} /> },
@@ -12,6 +12,10 @@ const components: { id: ComponentType; label: string; icon: React.ReactNode }[] 
   { id: 'select', label: 'Select', icon: <List size={20} /> },
   { id: 'checkbox', label: 'Checkbox', icon: <CheckSquare size={20} /> },
   { id: 'alert', label: 'Alert', icon: <AlertCircle size={20} /> },
+  { id: 'modal', label: 'Modal', icon: <AppWindow size={20} /> },
+  { id: 'tabs', label: 'Tabs', icon: <Layout size={20} /> },
+  { id: 'navbar', label: 'Navbar', icon: <Navigation size={20} /> },
+  { id: 'toast', label: 'Toast', icon: <MessageSquare size={20} /> },
 ];
 
 export default function ComponentSelector() {

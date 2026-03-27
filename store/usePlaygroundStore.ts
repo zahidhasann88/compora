@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 
-export type ComponentType = 'button' | 'card' | 'input' | 'badge' | 'avatar' | 'select' | 'checkbox' | 'alert';
+export type ComponentType = 'button' | 'card' | 'input' | 'badge' | 'avatar' | 'select' | 'checkbox' | 'alert' | 'modal' | 'tabs' | 'navbar' | 'toast';
 export type Variant = 'primary' | 'secondary' | 'outline';
 export type Device = 'mobile' | 'tablet' | 'desktop';
 
