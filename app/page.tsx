@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, useRef, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { usePlaygroundStore } from '@/store/usePlaygroundStore';
 import ComponentSelector from '@/components/ComponentSelector';
@@ -15,6 +15,11 @@ function PlaygroundContent() {
   const searchParams = useSearchParams();
   const { loadFromParams, loadFromLocalStorage } = usePlaygroundStore();
   const [ready, setReady] = useState(false);
+  const [codePanelHeight, setCodePanelHeight] = useState(280);
+  const [isLg, setIsLg] = useState(false);
+  const isDragging = useRef(false);
+  const startY = useRef(0);
+  const startHeight = useRef(0);
 
   useEffect(() => {
     if (searchParams.toString()) {
@@ -24,6 +29,46 @@ function PlaygroundContent() {
     }
     setReady(true);
   }, [searchParams, loadFromParams, loadFromLocalStorage]);
+
+  // Track screen size for conditional height
+  useEffect(() => {
+    const check = () => setIsLg(window.innerWidth >= 1024);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    isDragging.current = true;
+    startY.current = e.clientY;
+    startHeight.current = codePanelHeight;
+    document.body.style.cursor = 'row-resize';
+    document.body.style.userSelect = 'none';
+  }, [codePanelHeight]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging.current) return;
+      const delta = startY.current - e.clientY;
+      const newHeight = Math.min(600, Math.max(100, startHeight.current + delta));
+      setCodePanelHeight(newHeight);
+    };
+
+    const handleMouseUp = () => {
+      if (!isDragging.current) return;
+      isDragging.current = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, []);
 
   if (!ready) {
     return (
@@ -72,13 +117,25 @@ function PlaygroundContent() {
         </aside>
 
         {/* Center: Live Preview & Code Panel */}
-        <div className="flex-1 flex flex-col min-w-0 lg:overflow-hidden relative min-h-[600px] lg:min-h-0">
-          <main className="flex-1 min-h-[400px] lg:min-h-0 relative dot-grid flex flex-col">
+        <div className="flex-1 flex flex-col min-w-0 lg:overflow-hidden relative">
+          <main className="flex-1 min-h-[400px] lg:min-h-0 relative dot-grid flex flex-col overflow-hidden">
             <LivePreview />
           </main>
 
+          {/* Drag Handle */}
+          <div
+            className="hidden lg:flex items-center justify-center flex-shrink-0 cursor-row-resize group z-20 select-none border-t border-border hover:border-accent/40 transition-colors"
+            style={{ height: '8px' }}
+            onMouseDown={handleMouseDown}
+          >
+            <div className="w-10 h-1 rounded-full bg-border group-hover:bg-accent/60 group-active:bg-accent transition-colors" />
+          </div>
+
           {/* Bottom: Code Panel (Storybook Addons area) */}
-          <div className="lg:h-[280px] flex-shrink-0 border-t border-border bg-surface z-10 overflow-visible lg:overflow-hidden">
+          <div
+            className="flex-shrink-0 bg-surface z-10 overflow-hidden"
+            style={{ height: isLg ? `${codePanelHeight}px` : 'auto' }}
+          >
             <CodePanel />
           </div>
         </div>

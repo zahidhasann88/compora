@@ -26,10 +26,9 @@ export default function LivePreview() {
             title={d.label}
             className={`
               flex items-center justify-center w-8 h-8 rounded-md transition-all duration-200 cursor-pointer
-              ${
-                device === d.id
-                  ? 'bg-accent/15 text-accent shadow-sm'
-                  : 'text-muted hover:text-foreground hover:bg-surface-hover'
+              ${device === d.id
+                ? 'bg-accent/15 text-accent shadow-sm'
+                : 'text-muted hover:text-foreground hover:bg-surface-hover'
               }
             `}
           >

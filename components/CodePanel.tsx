@@ -146,9 +146,9 @@ export default function CodePanel() {
   }, [code, selectedComponent]);
 
   return (
-    <div className="glass-panel overflow-hidden">
+    <div className="glass-panel overflow-hidden h-full flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+      <div className="flex items-center justify-between px-5 py-3 border-b border-border flex-shrink-0">
         <div className="flex items-center gap-3">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
             Code Output
@@ -212,7 +212,7 @@ export default function CodePanel() {
       </div>
 
       {/* Code */}
-      <div className="p-5 overflow-x-auto">
+      <div className="flex-1 min-h-0 overflow-auto p-5">
         <pre className="font-mono text-sm text-foreground/90">
           <code>{highlightJSX(code)}</code>
         </pre>
