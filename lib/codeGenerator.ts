@@ -187,6 +187,152 @@ export function generateInputCode(styles: Styles, variant: Variant): string {
   return `<input\n  type="text"\n  placeholder="Type something..."\n  className="${classes}"\n/>`;
 }
 
+export function generateBadgeCode(styles: Styles, variant: Variant): string {
+  const radius = mapBorderRadius(styles.borderRadius);
+  // Default to a smaller font for badge if not huge
+  const fontSize = mapFontSize(styles.fontSize);
+  const padding = mapPaddingXY(styles.padding);
+  
+  const isWhiteText = styles.textColor.toLowerCase() === '#ffffff';
+  const textColor = isWhiteText ? 'text-slate-900 dark:text-white' : mapTextColor(styles.textColor);
+
+  let classes: string;
+  switch (variant) {
+    case 'primary':
+      classes = `${mapBgColor(styles.bgColor)} ${mapTextColor(styles.textColor)} ${padding} ${radius} ${fontSize} font-semibold inline-flex items-center justify-center transition-colors`;
+      break;
+    case 'secondary':
+      classes = `${mapBgColor(styles.bgColor)}/20 ${mapTextColor(styles.bgColor)} ${padding} ${radius} ${fontSize} font-semibold inline-flex items-center justify-center transition-colors`;
+      break;
+    case 'outline':
+      classes = `bg-transparent ${mapTextColor(styles.bgColor)} border-2 ${mapBorderColor(styles.bgColor)} ${padding} ${radius} ${fontSize} font-semibold inline-flex items-center justify-center transition-colors`;
+      break;
+  }
+
+  return `<span className="${classes}">\n  Badge\n</span>`;
+}
+
+export function generateAvatarCode(styles: Styles, variant: Variant): string {
+  const radius = mapBorderRadius(styles.borderRadius);
+  const fontSize = mapFontSize(styles.fontSize);
+  
+  const isWhiteText = styles.textColor.toLowerCase() === '#ffffff';
+  const textColor = isWhiteText ? 'text-slate-900 dark:text-white' : mapTextColor(styles.textColor);
+
+  let classes: string;
+  switch (variant) {
+    case 'primary':
+      classes = `${mapBgColor(styles.bgColor)} ${mapTextColor(styles.textColor)} ${radius} ${fontSize} font-semibold inline-flex items-center justify-center w-12 h-12 uppercase shrink-0 transition-colors`;
+      break;
+    case 'secondary':
+      classes = `${mapBgColor(styles.bgColor)}/20 ${mapTextColor(styles.bgColor)} ${radius} ${fontSize} font-semibold inline-flex items-center justify-center w-12 h-12 uppercase shrink-0 transition-colors`;
+      break;
+    case 'outline':
+      classes = `bg-transparent ${mapTextColor(styles.bgColor)} border-2 ${mapBorderColor(styles.bgColor)} ${radius} ${fontSize} font-semibold inline-flex items-center justify-center w-12 h-12 uppercase shrink-0 transition-colors`;
+      break;
+  }
+
+  return `<div className="${classes}">\n  AB\n</div>`;
+}
+
+export function generateSelectCode(styles: Styles, variant: Variant): string {
+  const radius = mapBorderRadius(styles.borderRadius);
+  const fontSize = mapFontSize(styles.fontSize);
+  const padding = mapPadding(styles.padding);
+  
+  const isWhiteText = styles.textColor.toLowerCase() === '#ffffff';
+  const textColor = isWhiteText ? 'text-slate-900 dark:text-white' : mapTextColor(styles.textColor);
+
+  let classes: string;
+  switch (variant) {
+    case 'primary':
+      classes = `dark:${mapBgColor(styles.bgColor)}/5 ${mapBgColor(styles.bgColor)}/5 ${textColor} ${padding} ${radius} ${fontSize} border ${mapBorderColor(styles.bgColor)}/30 outline-none w-full appearance-none focus:${mapBorderColor(styles.bgColor)} transition-colors`;
+      break;
+    case 'secondary':
+      classes = `dark:${mapBgColor(styles.bgColor)}/10 ${mapBgColor(styles.bgColor)}/5 ${textColor} ${padding} ${radius} ${fontSize} border ${mapBorderColor(styles.bgColor)}/20 outline-none w-full appearance-none focus:${mapBorderColor(styles.bgColor)} transition-colors`;
+      break;
+    case 'outline':
+      classes = `bg-transparent ${textColor} border-2 ${mapBorderColor(styles.bgColor)} ${padding} ${radius} ${fontSize} outline-none appearance-none w-full transition-colors focus:${mapBorderColor(styles.bgColor)}`;
+      break;
+  }
+
+  // Adding a custom dropdown arrow with a background image would be too long, using an icon wrapper in JSX is common
+  return `<div className="relative w-full">
+  <select className="${classes}">
+    <option>Option 1</option>
+    <option>Option 2</option>
+    <option>Option 3</option>
+  </select>
+  <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none opacity-50">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+  </div>
+</div>`;
+}
+
+export function generateCheckboxCode(styles: Styles, variant: Variant): string {
+  const radius = mapBorderRadius(styles.borderRadius);
+  const isWhiteText = styles.textColor.toLowerCase() === '#ffffff';
+  const textColor = isWhiteText ? 'text-slate-900 dark:text-white' : mapTextColor(styles.textColor);
+  const activeBg = mapBgColor(styles.bgColor);
+  const activeBorder = mapBorderColor(styles.bgColor);
+
+  return `<label className="flex items-center gap-3 cursor-pointer group">
+  <div className="relative flex items-center justify-center">
+    <input 
+      type="checkbox" 
+      className="peer appearance-none w-6 h-6 border-2 ${activeBorder} ${radius} checked:${activeBg} bg-transparent transition-all outline-none" 
+    />
+    <svg 
+      className="absolute w-4 h-4 text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity" 
+      viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
+    >
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </div>
+  <span className="${textColor} font-medium select-none">
+    Accept Terms & Conditions
+  </span>
+</label>`;
+}
+
+export function generateAlertCode(styles: Styles, variant: Variant): string {
+  const radius = mapBorderRadius(styles.borderRadius);
+  const fontSize = mapFontSize(styles.fontSize);
+  const padding = mapPadding(styles.padding);
+  
+  const isWhiteText = styles.textColor.toLowerCase() === '#ffffff';
+  const textColor = isWhiteText ? 'text-slate-900 dark:text-white' : mapTextColor(styles.textColor);
+
+  let classes: string;
+  switch (variant) {
+    case 'primary':
+      classes = `dark:${mapBgColor(styles.bgColor)}/10 ${mapBgColor(styles.bgColor)}/10 ${textColor} ${padding} ${radius} ${fontSize} flex gap-4 w-full`;
+      break;
+    case 'secondary':
+      classes = `dark:${mapBgColor(styles.bgColor)}/5 ${mapBgColor(styles.bgColor)}/5 ${textColor} ${padding} ${radius} ${fontSize} flex gap-4 w-full`;
+      break;
+    case 'outline':
+      classes = `bg-transparent border-2 ${mapBorderColor(styles.bgColor)} ${textColor} ${padding} ${radius} ${fontSize} flex gap-4 w-full`;
+      break;
+  }
+
+  const descClass = isWhiteText ? 'text-slate-600 dark:text-slate-400' : 'opacity-80';
+
+  return `<div className="${classes}" role="alert">
+  <div className="shrink-0 mt-0.5">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+  </div>
+  <div className="flex-1">
+    <h4 className="font-semibold mb-1">
+      Information Update
+    </h4>
+    <p className="${descClass}">
+      Please review the new features we added to the dashboard.
+    </p>
+  </div>
+</div>`;
+}
+
 export function generateCode(
   component: string,
   styles: Styles,
@@ -199,6 +345,16 @@ export function generateCode(
       return generateCardCode(styles, variant);
     case 'input':
       return generateInputCode(styles, variant);
+    case 'badge':
+      return generateBadgeCode(styles, variant);
+    case 'avatar':
+      return generateAvatarCode(styles, variant);
+    case 'select':
+      return generateSelectCode(styles, variant);
+    case 'checkbox':
+      return generateCheckboxCode(styles, variant);
+    case 'alert':
+      return generateAlertCode(styles, variant);
     default:
       return '';
   }
