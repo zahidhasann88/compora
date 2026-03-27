@@ -1,10 +1,12 @@
 'use client';
 
 import { create } from 'zustand';
+import type { CodeFormat } from '@/lib/codeFormatGenerator';
 
 export type ComponentType = 'button' | 'card' | 'input' | 'badge' | 'avatar' | 'select' | 'checkbox' | 'alert' | 'modal' | 'tabs' | 'navbar' | 'toast' | 'table' | 'dropdown' | 'command' | 'datepicker';
 export type Variant = 'primary' | 'secondary' | 'outline';
 export type Device = 'mobile' | 'tablet' | 'desktop';
+export type PreviewBg = 'dots' | 'checkered' | 'surface' | 'white' | 'dark';
 
 export interface Styles {
   bgColor: string;
@@ -18,21 +20,28 @@ export interface HistoryState {
   selectedComponent: ComponentType;
   styles: Styles;
   variant: Variant;
+  componentProps: Record<string, any>;
 }
 
 interface PlaygroundState {
   selectedComponent: ComponentType;
   styles: Styles;
   variant: Variant;
+  componentProps: Record<string, any>;
   device: Device;
+  previewBg: PreviewBg;
   theme: 'light' | 'dark';
   past: HistoryState[];
   future: HistoryState[];
 
   setComponent: (component: ComponentType) => void;
   updateStyle: (key: keyof Styles, value: string) => void;
+  updateComponentProp: (key: string, value: any) => void;
   setVariant: (variant: Variant) => void;
   setDevice: (device: Device) => void;
+  setPreviewBg: (bg: PreviewBg) => void;
+  codeFormat: CodeFormat;
+  setCodeFormat: (format: CodeFormat) => void;
   toggleTheme: () => void;
   loadFromParams: (params: URLSearchParams) => void;
   toQueryString: () => string;
@@ -42,6 +51,7 @@ interface PlaygroundState {
   saveHistory: () => void;
   undo: () => void;
   redo: () => void;
+  resetStyles: () => void;
 }
 
 const defaultStyles: Styles = {
@@ -56,22 +66,48 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
   selectedComponent: 'button',
   styles: { ...defaultStyles },
   variant: 'primary',
+  componentProps: {
+    // Defaults for specific components
+    button: { disabled: false, text: 'Click me' },
+    card: { shadow: 'md' },
+    input: { disabled: false, placeholder: 'Type something...' },
+    badge: { showDot: false },
+    modal: { backdrop: 'sm' },
+    table: { striped: true, hoverable: true }
+  },
   device: 'desktop',
+  previewBg: 'dots',
   theme: 'dark',
   past: [],
   future: [],
+  setPreviewBg: (bg) => set({ previewBg: bg }),
+  codeFormat: 'jsx-tailwind',
+
+  setCodeFormat: (format) => set({ codeFormat: format }),
+
+  resetStyles: () => {
+    get().saveHistory();
+    set({ styles: { ...defaultStyles }, variant: 'primary', componentProps: {
+      button: { disabled: false, text: 'Click me' },
+      card: { shadow: 'md' },
+      input: { disabled: false, placeholder: 'Type something...' },
+      badge: { showDot: false },
+      modal: { backdrop: 'sm' },
+      table: { striped: true, hoverable: true }
+    } });
+  },
 
   saveHistory: () => {
-    const { selectedComponent, styles, variant, past } = get();
+    const { selectedComponent, styles, variant, componentProps, past } = get();
     // Only save if last state is different (shallow check avoiding duplicates)
     set({
-      past: [...past, { selectedComponent, styles: { ...styles }, variant }],
+      past: [...past, { selectedComponent, styles: { ...styles }, variant, componentProps: { ...componentProps } }],
       future: [], // clear future on new actions
     });
   },
 
   undo: () => {
-    const { past, future, selectedComponent, styles, variant } = get();
+    const { past, future, selectedComponent, styles, variant, componentProps } = get();
     if (past.length === 0) return;
     
     const previous = past[past.length - 1];
@@ -79,26 +115,28 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
     
     set({
       past: newPast,
-      future: [{ selectedComponent, styles: { ...styles }, variant }, ...future],
+      future: [{ selectedComponent, styles: { ...styles }, variant, componentProps: { ...componentProps } }, ...future],
       selectedComponent: previous.selectedComponent,
       styles: previous.styles,
       variant: previous.variant,
+      componentProps: previous.componentProps,
     });
   },
 
   redo: () => {
-    const { past, future, selectedComponent, styles, variant } = get();
+    const { past, future, selectedComponent, styles, variant, componentProps } = get();
     if (future.length === 0) return;
     
     const next = future[0];
     const newFuture = future.slice(1);
     
     set({
-      past: [...past, { selectedComponent, styles: { ...styles }, variant }],
+      past: [...past, { selectedComponent, styles: { ...styles }, variant, componentProps: { ...componentProps } }],
       future: newFuture,
       selectedComponent: next.selectedComponent,
       styles: next.styles,
       variant: next.variant,
+      componentProps: next.componentProps,
     });
   },
 
@@ -107,9 +145,26 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
     set({ selectedComponent: component });
   },
 
-  updateStyle: (key, value) => set((state) => ({
-    styles: { ...state.styles, [key]: value },
-  })),
+  updateStyle: (key, value) => {
+    get().saveHistory();
+    set((state) => ({
+      styles: { ...state.styles, [key]: value },
+    }));
+  },
+
+  updateComponentProp: (key, value) => {
+    get().saveHistory();
+    const { selectedComponent } = get();
+    set((state) => ({
+      componentProps: {
+        ...state.componentProps,
+        [selectedComponent]: {
+          ...(state.componentProps[selectedComponent] || {}),
+          [key]: value
+        }
+      }
+    }));
+  },
 
   setVariant: (variant) => {
     get().saveHistory();
@@ -131,6 +186,7 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
     const padding = params.get('p');
     const borderRadius = params.get('r');
     const fontSize = params.get('fs');
+    const bgPattern = params.get('pbg') as PreviewBg | null;
 
     set((state) => ({
       selectedComponent: component || state.selectedComponent,
@@ -142,11 +198,12 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
         borderRadius: borderRadius || state.styles.borderRadius,
         fontSize: fontSize || state.styles.fontSize,
       },
+      previewBg: bgPattern || state.previewBg,
     }));
   },
 
   toQueryString: () => {
-    const { selectedComponent, variant, styles } = get();
+    const { selectedComponent, variant, styles, previewBg, componentProps } = get();
     const params = new URLSearchParams({
       component: selectedComponent,
       variant,
@@ -156,14 +213,23 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
       r: styles.borderRadius,
       fs: styles.fontSize,
     });
+    
+    // Serialize specifically the active component's props to save space
+    if (componentProps[selectedComponent]) {
+      const activeProps = componentProps[selectedComponent];
+      Object.keys(activeProps).forEach(key => {
+        params.set(`p_${key}`, activeProps[key].toString());
+      });
+    }
+
     return params.toString();
   },
 
   saveToLocalStorage: () => {
-    const { selectedComponent, styles, variant } = get();
+    const { selectedComponent, styles, variant, componentProps } = get();
     localStorage.setItem(
       'playground-state',
-      JSON.stringify({ selectedComponent, styles, variant })
+      JSON.stringify({ selectedComponent, styles, variant, componentProps })
     );
   },
 
@@ -176,6 +242,7 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
           selectedComponent: parsed.selectedComponent,
           styles: parsed.styles,
           variant: parsed.variant,
+          componentProps: parsed.componentProps || get().componentProps,
         });
       }
     } catch {

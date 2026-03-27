@@ -9,11 +9,16 @@ import LivePreview from '@/components/LivePreview';
 import CodePanel from '@/components/CodePanel';
 import ThemeToggle from '@/components/ThemeToggle';
 import ActionBar from '@/components/ActionBar';
+import { useKeyboardShortcuts } from '@/components/useKeyboardShortcuts';
 import { Layers } from 'lucide-react';
 
 function PlaygroundContent() {
   const searchParams = useSearchParams();
   const { loadFromParams, loadFromLocalStorage } = usePlaygroundStore();
+  
+  // Initialize keyboard shortcuts
+  useKeyboardShortcuts();
+
   const [ready, setReady] = useState(false);
   const [codePanelHeight, setCodePanelHeight] = useState(280);
   const [isLg, setIsLg] = useState(false);

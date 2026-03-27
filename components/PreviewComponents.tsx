@@ -284,7 +284,8 @@ function getDatepickerStyles(styles: Styles, variant: Variant, theme: 'light' | 
 }
 
 export default function PreviewComponents() {
-  const { selectedComponent, styles, variant, theme } = usePlaygroundStore();
+  const { selectedComponent, styles, variant, theme, componentProps } = usePlaygroundStore();
+  const props = componentProps[selectedComponent] || {};
 
   const isWhiteText = styles.textColor.toLowerCase() === '#ffffff';
   const descOpacity = isWhiteText && theme === 'light' ? 0.6 : 0.8;
@@ -292,31 +293,61 @@ export default function PreviewComponents() {
   return (
     <div className="flex items-center justify-center min-h-[200px] w-full">
       {selectedComponent === 'button' && (
-        <button style={getButtonStyles(styles, variant)} className="animate-fade-in">
-          Click me
+        <button 
+          style={{
+            ...getButtonStyles(styles, variant),
+            opacity: props.disabled ? 0.5 : 1,
+            cursor: props.disabled ? 'not-allowed' : 'pointer'
+          }} 
+          disabled={props.disabled}
+          className="animate-fade-in"
+        >
+          {props.text || 'Click me'}
         </button>
       )}
       
-      {selectedComponent === 'card' && (
-        <div style={getCardStyles(styles, variant, theme)} className="animate-fade-in">
-          <h3 style={{ marginBottom: '8px', fontWeight: 600 }}>Card Title</h3>
-          <p style={{ opacity: descOpacity, margin: 0 }}>
-            This is a description for the card component.
-          </p>
-        </div>
-      )}
+      {selectedComponent === 'card' && (() => {
+        const shadowMap: Record<string, string> = {
+          none: 'none',
+          sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+          md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+          lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+          xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
+        };
+        const shadowStyle = shadowMap[props.shadow || 'md'];
+        
+        return (
+          <div style={{...getCardStyles(styles, variant, theme), boxShadow: shadowStyle}} className="animate-fade-in">
+            <h3 style={{ marginBottom: '8px', fontWeight: 600 }}>Card Title</h3>
+            <p style={{ opacity: descOpacity, margin: 0 }}>
+              This is a description for the card component.
+            </p>
+          </div>
+        );
+      })()}
       
       {selectedComponent === 'input' && (
         <input
           type="text"
-          placeholder="Type something..."
-          style={getInputStyles(styles, variant, theme)}
+          placeholder={props.placeholder || 'Type something...'}
+          disabled={props.disabled}
+          style={{
+            ...getInputStyles(styles, variant, theme),
+            opacity: props.disabled ? 0.5 : 1,
+            cursor: props.disabled ? 'not-allowed' : 'text'
+          }}
           className="animate-fade-in"
         />
       )}
       
       {selectedComponent === 'badge' && (
         <span style={getBadgeStyles(styles, variant, theme)} className="animate-fade-in">
+          {props.showDot && (
+            <span style={{ 
+              width: '6px', height: '6px', borderRadius: '50%', marginRight: '6px',
+              backgroundColor: (isWhiteText && theme === 'light') ? '#0f172a' : styles.textColor 
+            }}></span>
+          )}
           Badge
         </span>
       )}
@@ -389,37 +420,54 @@ export default function PreviewComponents() {
         </div>
       )}
 
-      {selectedComponent === 'modal' && (
-        <div className="relative w-full h-full flex items-center justify-center animate-fade-in">
-          <div style={getModalStyles(styles, variant, theme)}>
-            <div className="flex justify-between items-center" style={{ marginBottom: '16px' }}>
-              <h3 style={{ margin: 0, fontWeight: 600, fontSize: '1.125rem' }}>Modal Title</h3>
-              <span style={{ opacity: 0.5, cursor: 'pointer', fontSize: '1.25rem' }}>&times;</span>
-            </div>
-            <p style={{ opacity: descOpacity, fontSize: '0.875rem', marginBottom: '24px' }}>
-              This is the modal body content. You can place forms or information here.
-            </p>
-            <div className="flex justify-end gap-3">
-              <button 
-                style={{ 
-                  padding: '8px 16px', borderRadius: '6px', fontSize: '0.875rem', fontWeight: 500,
-                  backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'
-                }}
-              >
-                Cancel
-              </button>
-              <button 
-                style={{ 
-                  padding: '8px 16px', borderRadius: '6px', fontSize: '0.875rem', fontWeight: 500,
-                  backgroundColor: styles.bgColor, color: '#ffffff'
-                }}
-              >
-                Confirm
-              </button>
+      {selectedComponent === 'modal' && (() => {
+        const blurMap: Record<string, string> = {
+          none: 'none',
+          sm: 'blur(4px)',
+          md: 'blur(8px)'
+        };
+        const backdropColor = theme === 'dark' ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.4)';
+
+        return (
+          <div className="relative w-full h-full flex items-center justify-center animate-fade-in">
+            {/* Backdrop */}
+            <div style={{
+              position: 'absolute', inset: 0, 
+              backgroundColor: backdropColor,
+              backdropFilter: blurMap[props.backdrop || 'sm']
+            }}></div>
+            
+            <div style={{...getModalStyles(styles, variant, theme), position: 'relative', zIndex: 10}}>
+              <div className="flex justify-between items-center" style={{ marginBottom: '16px' }}>
+                <h3 style={{ margin: 0, fontWeight: 600, fontSize: '1.125rem' }}>Modal Title</h3>
+                <span style={{ opacity: 0.5, cursor: 'pointer', fontSize: '1.25rem' }}>&times;</span>
+              </div>
+              <p style={{ opacity: descOpacity, fontSize: '0.875rem', marginBottom: '24px' }}>
+                This is the modal body content. You can place forms or information here.
+              </p>
+              <div className="flex justify-end gap-3">
+                <button 
+                  style={{ 
+                    padding: '8px 16px', borderRadius: '6px', fontSize: '0.875rem', fontWeight: 500,
+                    backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                    color: theme === 'dark' ? '#fff' : '#000', border: 'none'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button 
+                  style={{ 
+                    padding: '8px 16px', borderRadius: '6px', fontSize: '0.875rem', fontWeight: 500,
+                    backgroundColor: styles.bgColor, color: '#ffffff', border: 'none'
+                  }}
+                >
+                  Confirm
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {selectedComponent === 'tabs' && (
         <div className="w-full max-w-[400px] animate-fade-in">
@@ -452,39 +500,74 @@ export default function PreviewComponents() {
         </div>
       )}
 
-      {selectedComponent === 'navbar' && (
-        <div className="absolute top-0 left-0 w-full animate-fade-in border-b border-border/40" style={{
-          backgroundColor: theme === 'dark' ? 'rgba(2, 6, 23, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-          backdropFilter: 'blur(8px)'
-        }}>
-          <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: `${Math.max(8, Number(styles.padding) / 2)}px ${styles.padding}px`,
-            height: '56px', width: '100%', maxWidth: '1280px', margin: '0 auto'
+      {selectedComponent === 'navbar' && (() => {
+        const isTransparent = props.transparent;
+        const isSticky = props.sticky;
+        
+        let navBg = theme === 'dark' ? 'rgba(2, 6, 23, 0.8)' : 'rgba(255, 255, 255, 0.8)';
+        let navFilter = 'blur(8px)';
+        let navBorder = theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+        
+        if (isTransparent) {
+          navBg = 'transparent';
+          navFilter = 'none';
+          navBorder = 'transparent';
+        }
+
+        const positioning = isSticky 
+          ? { position: 'sticky' as const, top: 0, zIndex: 50, left: 0 } 
+          : { position: 'absolute' as const, top: 0, left: 0 };
+
+        return (
+          <div className="w-full animate-fade-in" style={{
+            ...positioning,
+            borderBottom: `1px solid ${navBorder}`,
+            backgroundColor: navBg,
+            backdropFilter: navFilter
           }}>
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2 font-bold" style={{ color: (isWhiteText && theme === 'light') ? '#0f172a' : styles.textColor }}>
-                <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: styles.bgColor }}></div>
-                Brand
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: `${Math.max(8, Number(styles.padding) / 2)}px ${styles.padding}px`,
+              height: '56px', width: '100%', maxWidth: '1280px', margin: '0 auto'
+            }}>
+              <div className="flex items-center">
+                {props.mobileMenu && (
+                  <>
+                    <button className="md:hidden mr-4 p-2 -ml-2" style={{ color: (isWhiteText && theme === 'light') ? '#0f172a' : styles.textColor }}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                    </button>
+                    <div className="md:hidden flex items-center gap-2 font-bold mr-6" style={{ color: (isWhiteText && theme === 'light') ? '#0f172a' : styles.textColor }}>
+                      <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: styles.bgColor }}></div>
+                      Brand
+                    </div>
+                  </>
+                )}
+                <div className="hidden md:flex items-center gap-6">
+                  <div className="flex items-center gap-2 font-bold" style={{ color: (isWhiteText && theme === 'light') ? '#0f172a' : styles.textColor }}>
+                    <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: styles.bgColor }}></div>
+                    Brand
+                  </div>
+                  <div className="flex gap-4 text-sm font-medium" style={{ color: (isWhiteText && theme === 'light') ? '#0f172a' : styles.textColor }}>
+                    <span className="opacity-100">Products</span>
+                    <span className="opacity-60 hover:opacity-100 cursor-pointer">Pricing</span>
+                    <span className="opacity-60 hover:opacity-100 cursor-pointer">About</span>
+                  </div>
+                </div>
               </div>
-              <div className="hidden md:flex gap-4 text-sm font-medium" style={{ color: (isWhiteText && theme === 'light') ? '#0f172a' : styles.textColor }}>
-                <span className="opacity-100">Products</span>
-                <span className="opacity-60 hover:opacity-100 cursor-pointer">Pricing</span>
-                <span className="opacity-60 hover:opacity-100 cursor-pointer">About</span>
+              <div className="flex items-center gap-2 md:space-x-2 md:justify-end">
+                <div className="hidden md:flex items-center px-3 py-1.5 text-sm rounded-md border border-input opacity-60 w-full md:w-auto" style={{ width: '160px' }}>
+                  Search...
+                </div>
+                <button style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  padding: '6px 16px', borderRadius: `${styles.borderRadius}px`, fontSize: '0.875rem', fontWeight: 500,
+                  backgroundColor: styles.bgColor, color: '#ffffff', border: 'none', height: '36px'
+                }}>Sign In</button>
               </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="hidden md:flex items-center px-3 py-1.5 text-sm rounded-md border border-input opacity-60" style={{ width: '160px' }}>
-                Search...
-              </div>
-              <button style={{
-                padding: '6px 16px', borderRadius: `${styles.borderRadius}px`, fontSize: '0.875rem', fontWeight: 500,
-                backgroundColor: styles.bgColor, color: '#ffffff'
-              }}>Sign In</button>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {selectedComponent === 'toast' && (
         <div style={getToastStyles(styles, variant, theme)} className="animate-fade-in slide-in-from-bottom-2">
@@ -497,34 +580,40 @@ export default function PreviewComponents() {
         </div>
       )}
 
-      {selectedComponent === 'table' && (
-        <div style={getTableStyles(styles, variant, theme)} className="animate-fade-in">
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem', textAlign: 'left' }}>
-            <thead style={{ backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)', borderBottom: `1px solid ${theme === 'dark' ? '#1e293b' : '#e2e8f0'}` }}>
-              <tr>
-                <th style={{ padding: '12px 16px', fontWeight: 500, color: theme === 'dark' ? '#94a3b8' : '#64748b' }}>Invoice</th>
-                <th style={{ padding: '12px 16px', fontWeight: 500, color: theme === 'dark' ? '#94a3b8' : '#64748b' }}>Status</th>
-                <th style={{ padding: '12px 16px', fontWeight: 500, color: theme === 'dark' ? '#94a3b8' : '#64748b' }}>Method</th>
-                <th style={{ padding: '12px 16px', fontWeight: 500, color: theme === 'dark' ? '#94a3b8' : '#64748b', textAlign: 'right' }}>Amount</th>
-              </tr>
-            </thead>
-            <tbody style={{ color: (isWhiteText && theme === 'light') ? '#0f172a' : styles.textColor }}>
-              <tr style={{ borderBottom: `1px solid ${theme === 'dark' ? '#1e293b' : '#e2e8f0'}` }}>
-                <td style={{ padding: '16px', fontWeight: 500 }}>INV001</td>
-                <td style={{ padding: '16px' }}>Paid</td>
-                <td style={{ padding: '16px' }}>Credit Card</td>
-                <td style={{ padding: '16px', textAlign: 'right' }}>$250.00</td>
-              </tr>
-              <tr>
-                <td style={{ padding: '16px', fontWeight: 500 }}>INV002</td>
-                <td style={{ padding: '16px' }}>Pending</td>
-                <td style={{ padding: '16px' }}>PayPal</td>
-                <td style={{ padding: '16px', textAlign: 'right' }}>$150.00</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      )}
+      {selectedComponent === 'table' && (() => {
+        const isStriped = props.striped ?? true;
+        const rootStyles = getTableStyles(styles, variant, theme);
+        const stripeColor = theme === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)';
+        
+        return (
+          <div style={rootStyles} className="animate-fade-in">
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem', textAlign: 'left' }}>
+              <thead style={{ backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)', borderBottom: `1px solid ${theme === 'dark' ? '#1e293b' : '#e2e8f0'}` }}>
+                <tr>
+                  <th style={{ padding: '12px 16px', fontWeight: 500, color: theme === 'dark' ? '#94a3b8' : '#64748b' }}>Invoice</th>
+                  <th style={{ padding: '12px 16px', fontWeight: 500, color: theme === 'dark' ? '#94a3b8' : '#64748b' }}>Status</th>
+                  <th style={{ padding: '12px 16px', fontWeight: 500, color: theme === 'dark' ? '#94a3b8' : '#64748b' }}>Method</th>
+                  <th style={{ padding: '12px 16px', fontWeight: 500, color: theme === 'dark' ? '#94a3b8' : '#64748b', textAlign: 'right' }}>Amount</th>
+                </tr>
+              </thead>
+              <tbody style={{ color: (isWhiteText && theme === 'light') ? '#0f172a' : styles.textColor }}>
+                <tr style={{ borderBottom: `1px solid ${theme === 'dark' ? '#1e293b' : '#e2e8f0'}` }} className={props.hoverable ? "hover:bg-foreground/5 transition-colors" : ""}>
+                  <td style={{ padding: '16px', fontWeight: 500 }}>INV001</td>
+                  <td style={{ padding: '16px' }}>Paid</td>
+                  <td style={{ padding: '16px' }}>Credit Card</td>
+                  <td style={{ padding: '16px', textAlign: 'right' }}>$250.00</td>
+                </tr>
+                <tr style={{ backgroundColor: isStriped ? stripeColor : 'transparent' }} className={props.hoverable ? "hover:bg-foreground/5 transition-colors" : ""}>
+                  <td style={{ padding: '16px', fontWeight: 500 }}>INV002</td>
+                  <td style={{ padding: '16px' }}>Pending</td>
+                  <td style={{ padding: '16px' }}>PayPal</td>
+                  <td style={{ padding: '16px', textAlign: 'right' }}>$150.00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        );
+      })()}
 
       {selectedComponent === 'dropdown' && (
         <div className="flex flex-col items-center animate-fade-in">

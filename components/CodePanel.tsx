@@ -3,6 +3,15 @@
 import React, { useState, useCallback } from 'react';
 import { usePlaygroundStore } from '@/store/usePlaygroundStore';
 import { generateCode } from '@/lib/codeGenerator';
+import {
+  CODE_FORMATS,
+  generateHTMLCSS,
+  generateReactCSSModules,
+  generateVueSFC,
+  generateAngular,
+  generateSvelte,
+  type CodeFormat,
+} from '@/lib/codeFormatGenerator';
 import { Copy, Check, Download } from 'lucide-react';
 
 type Token = { text: string; color?: string };
@@ -12,8 +21,16 @@ function tokenizeLine(line: string): Token[] {
   let remaining = line;
 
   while (remaining.length > 0) {
+    // Match HTML/XML comment
+    let match = remaining.match(/^(<!--[\s\S]*?-->)/);
+    if (match) {
+      tokens.push({ text: match[1], color: '#6b7280' });
+      remaining = remaining.slice(match[0].length);
+      continue;
+    }
+
     // Match JSX opening/closing tag: < or </ followed by tag name
-    let match = remaining.match(/^(<\/?)([\w]+)/);
+    match = remaining.match(/^(<\/?)([a-zA-Z][\w.-]*)/);
     if (match) {
       tokens.push({ text: match[1], color: '#f97316' });
       tokens.push({ text: match[2], color: '#f97316' });
@@ -54,16 +71,57 @@ function tokenizeLine(line: string): Token[] {
       continue;
     }
 
+    // Match backtick string
+    match = remaining.match(/^`([^`]*)`/);
+    if (match) {
+      tokens.push({ text: `\`${match[1]}\``, color: '#34d399' });
+      remaining = remaining.slice(match[0].length);
+      continue;
+    }
+
+    // Match CSS property (word followed by colon in style blocks)
+    match = remaining.match(/^([a-z][\w-]*)(:\s)/);
+    if (match) {
+      tokens.push({ text: match[1], color: '#67e8f9' });
+      tokens.push({ text: match[2] });
+      remaining = remaining.slice(match[0].length);
+      continue;
+    }
+
     // Match braces
-    match = remaining.match(/^([{}])/);
+    match = remaining.match(/^([{}()[\]])/);
     if (match) {
       tokens.push({ text: match[1], color: '#fbbf24' });
       remaining = remaining.slice(1);
       continue;
     }
 
+    // Match keywords
+    match = remaining.match(/^(import|from|export|default|function|return|const|let|var|class|extends|implements|interface|type|template|script|style|Component)\b/);
+    if (match) {
+      tokens.push({ text: match[1], color: '#c084fc' });
+      remaining = remaining.slice(match[0].length);
+      continue;
+    }
+
+    // Match @ decorator
+    match = remaining.match(/^(@\w+)/);
+    if (match) {
+      tokens.push({ text: match[1], color: '#fbbf24' });
+      remaining = remaining.slice(match[0].length);
+      continue;
+    }
+
+    // Match // comment
+    match = remaining.match(/^(\/\/.*)/);
+    if (match) {
+      tokens.push({ text: match[1], color: '#6b7280' });
+      remaining = remaining.slice(match[0].length);
+      continue;
+    }
+
     // Plain text (up to next special character)
-    match = remaining.match(/^[^<>/{}="'a-zA-Z]+|^[a-zA-Z][\w-]*/);
+    match = remaining.match(/^[^<>/{}="'`@()\[\]a-zA-Z]+|^[a-zA-Z][\w.-]*/);
     if (match) {
       tokens.push({ text: match[0] });
       remaining = remaining.slice(match[0].length);
@@ -78,7 +136,7 @@ function tokenizeLine(line: string): Token[] {
   return tokens;
 }
 
-function highlightJSX(code: string): React.ReactNode[] {
+function highlightCode(code: string): React.ReactNode[] {
   const lines = code.split('\n');
   return lines.map((line, i) => {
     const tokens = tokenizeLine(line);
@@ -103,12 +161,35 @@ function highlightJSX(code: string): React.ReactNode[] {
   });
 }
 
+function getFormattedCode(component: string, styles: Parameters<typeof generateCode>[1], variant: Parameters<typeof generateCode>[2], props: Record<string, any>, format: CodeFormat): string {
+  if (format === 'jsx-tailwind') {
+    return generateCode(component, styles, variant, props);
+  }
+  if (format === 'html-css') {
+    return generateHTMLCSS(component, styles, variant, props);
+  }
+  if (format === 'react-cssmodules') {
+    return generateReactCSSModules(component, styles, variant, props);
+  }
+  if (format === 'vue') {
+    return generateVueSFC(component, styles, variant, props);
+  }
+  if (format === 'angular') {
+    return generateAngular(component, styles, variant, props);
+  }
+  if (format === 'svelte') {
+    return generateSvelte(component, styles, variant, props);
+  }
+  return generateCode(component, styles, variant, props);
+}
+
 export default function CodePanel() {
-  const { selectedComponent, styles, variant } = usePlaygroundStore();
+  const { selectedComponent, styles, variant, codeFormat, setCodeFormat, componentProps } = usePlaygroundStore();
   const [copied, setCopied] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
 
-  const code = generateCode(selectedComponent, styles, variant);
+  const currentProps = componentProps[selectedComponent] || {};
+  const code = getFormattedCode(selectedComponent, styles, variant, currentProps, codeFormat);
 
   const handleCopy = useCallback(async () => {
     try {
@@ -129,13 +210,42 @@ export default function CodePanel() {
 
   const handleDownload = useCallback(() => {
     const componentName = selectedComponent.charAt(0).toUpperCase() + selectedComponent.slice(1);
-    const fileContent = `import React from 'react';\n\nexport default function ${componentName}Component() {\n  return (\n    ${code.split('\\n').join('\\n    ')}\n  );\n}\n`;
 
-    const blob = new Blob([fileContent], { type: 'text/javascript' });
+    let fileName: string;
+    let fileContent: string;
+
+    switch (codeFormat) {
+      case 'html-css':
+        fileName = `${componentName}.html`;
+        fileContent = code;
+        break;
+      case 'react-cssmodules':
+        fileName = `${componentName}.tsx`;
+        fileContent = code;
+        break;
+      case 'vue':
+        fileName = `${componentName}.vue`;
+        fileContent = code;
+        break;
+      case 'angular':
+        fileName = `${componentName}.component.ts`;
+        fileContent = code;
+        break;
+      case 'svelte':
+        fileName = `${componentName}.svelte`;
+        fileContent = code;
+        break;
+      default:
+        fileName = `${componentName}Component.tsx`;
+        fileContent = `import React from 'react';\n\nexport default function ${componentName}Component() {\n  return (\n    ${code.split('\\n').join('\\n    ')}\n  );\n}\n`;
+        break;
+    }
+
+    const blob = new Blob([fileContent], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${componentName}Component.tsx`;
+    a.download = fileName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -143,25 +253,41 @@ export default function CodePanel() {
 
     setDownloaded(true);
     setTimeout(() => setDownloaded(false), 2000);
-  }, [code, selectedComponent]);
+  }, [code, selectedComponent, codeFormat]);
+
+  const currentFormatInfo = CODE_FORMATS.find(f => f.id === codeFormat)!;
 
   return (
     <div className="glass-panel overflow-hidden h-full flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-border flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
-            Code Output
+      <div className="flex items-center justify-between px-5 py-2.5 border-b border-border flex-shrink-0">
+        <div className="flex items-center gap-1 overflow-x-auto hide-scrollbar">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-muted mr-2 whitespace-nowrap flex-shrink-0">
+            Code
           </h2>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent font-medium">
-            JSX + Tailwind
-          </span>
+          {CODE_FORMATS.map((format) => (
+            <button
+              key={format.id}
+              id={`format-${format.id}`}
+              onClick={() => setCodeFormat(format.id)}
+              className={`
+                px-2.5 py-1 rounded-md text-[11px] font-medium whitespace-nowrap
+                transition-all duration-200 cursor-pointer flex-shrink-0
+                ${codeFormat === format.id
+                  ? 'bg-accent/15 text-accent'
+                  : 'text-muted hover:text-foreground hover:bg-surface-hover'
+                }
+              `}
+            >
+              {format.label}
+            </button>
+          ))}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0 ml-3">
           <button
             id="download-code-btn"
             onClick={handleDownload}
-            title="Download React Component"
+            title={`Download as ${currentFormatInfo.label}`}
             className={`
               flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium
               transition-all duration-200 cursor-pointer
@@ -214,7 +340,7 @@ export default function CodePanel() {
       {/* Code */}
       <div className="flex-1 min-h-0 overflow-auto p-5">
         <pre className="font-mono text-sm text-foreground/90">
-          <code>{highlightJSX(code)}</code>
+          <code>{highlightCode(code)}</code>
         </pre>
       </div>
     </div>

@@ -109,31 +109,45 @@ function mapBorderColor(hex: string): string {
 
 // ── Code generators ──
 
-export function generateButtonCode(styles: Styles, variant: Variant): string {
+export function generateButtonCode(styles: Styles, variant: Variant, props: Record<string, any> = {}): string {
   const radius = mapBorderRadius(styles.borderRadius);
   const fontSize = mapFontSize(styles.fontSize);
   const padding = mapPaddingXY(styles.padding);
+  
+  const disabledStr = props.disabled ? ' opacity-50 cursor-not-allowed' : '';
 
   let classes: string;
   switch (variant) {
     case 'primary':
-      classes = `${mapBgColor(styles.bgColor)} ${mapTextColor(styles.textColor)} ${padding} ${radius} ${fontSize} font-semibold transition-colors hover:opacity-90`;
+      classes = `${mapBgColor(styles.bgColor)} ${mapTextColor(styles.textColor)} ${padding} ${radius} ${fontSize} font-semibold transition-colors hover:opacity-90${disabledStr}`;
       break;
     case 'secondary':
-      classes = `${mapBgColor(styles.bgColor)}/20 ${mapTextColor(styles.bgColor)} ${padding} ${radius} ${fontSize} font-semibold transition-colors hover:opacity-80`;
+      classes = `${mapBgColor(styles.bgColor)}/20 ${mapTextColor(styles.bgColor)} ${padding} ${radius} ${fontSize} font-semibold transition-colors hover:opacity-80${disabledStr}`;
       break;
     case 'outline':
-      classes = `bg-transparent ${mapTextColor(styles.bgColor)} border-2 ${mapBorderColor(styles.bgColor)} ${padding} ${radius} ${fontSize} font-semibold transition-colors hover:${mapBgColor(styles.bgColor).replace('bg-', 'bg-')}/10`;
+      classes = `bg-transparent ${mapTextColor(styles.bgColor)} border-2 ${mapBorderColor(styles.bgColor)} ${padding} ${radius} ${fontSize} font-semibold transition-colors hover:${mapBgColor(styles.bgColor).replace('bg-', 'bg-')}/10${disabledStr}`;
       break;
   }
 
-  return `<button\n  className="${classes}"\n>\n  Click me\n</button>`;
+  const text = props.text || 'Click me';
+  const attr = props.disabled ? '\n  disabled' : '';
+
+  return `<button\n  className="${classes}"${attr}\n>\n  ${text}\n</button>`;
 }
 
-export function generateCardCode(styles: Styles, variant: Variant): string {
+export function generateCardCode(styles: Styles, variant: Variant, props: Record<string, any> = {}): string {
   const radius = mapBorderRadius(styles.borderRadius);
   const fontSize = mapFontSize(styles.fontSize);
   const padding = mapPadding(styles.padding);
+  
+  const shadowMap: Record<string, string> = {
+    none: '',
+    sm: ' shadow-sm',
+    md: ' shadow-md',
+    lg: ' shadow-lg',
+    xl: ' shadow-xl'
+  };
+  const shadow = shadowMap[props.shadow || 'md'];
   
   const isWhiteText = styles.textColor.toLowerCase() === '#ffffff';
   const textColor = isWhiteText ? 'text-slate-900 dark:text-white' : mapTextColor(styles.textColor);
@@ -141,13 +155,13 @@ export function generateCardCode(styles: Styles, variant: Variant): string {
   let classes: string;
   switch (variant) {
     case 'primary':
-      classes = `dark:${mapBgColor(styles.bgColor)}/10 ${mapBgColor(styles.bgColor)}/5 ${textColor} ${padding} ${radius} ${fontSize}`;
+      classes = `dark:${mapBgColor(styles.bgColor)}/10 ${mapBgColor(styles.bgColor)}/5 ${textColor} ${padding} ${radius} ${fontSize}${shadow}`;
       break;
     case 'secondary':
-      classes = `dark:${mapBgColor(styles.bgColor)}/5 ${mapBgColor(styles.bgColor)}/5 ${textColor} ${padding} ${radius} ${fontSize}`;
+      classes = `dark:${mapBgColor(styles.bgColor)}/5 ${mapBgColor(styles.bgColor)}/5 ${textColor} ${padding} ${radius} ${fontSize}${shadow}`;
       break;
     case 'outline':
-      classes = `bg-transparent ${textColor} border-2 ${mapBorderColor(styles.bgColor)} ${padding} ${radius} ${fontSize}`;
+      classes = `bg-transparent ${textColor} border-2 ${mapBorderColor(styles.bgColor)} ${padding} ${radius} ${fontSize}${shadow}`;
       break;
   }
 
@@ -163,31 +177,35 @@ export function generateCardCode(styles: Styles, variant: Variant): string {
 </div>`;
 }
 
-export function generateInputCode(styles: Styles, variant: Variant): string {
+export function generateInputCode(styles: Styles, variant: Variant, props: Record<string, any> = {}): string {
   const radius = mapBorderRadius(styles.borderRadius);
   const fontSize = mapFontSize(styles.fontSize);
   const padding = mapPadding(styles.padding);
   
+  const disabledStr = props.disabled ? ' opacity-50 cursor-not-allowed' : '';
   const isWhiteText = styles.textColor.toLowerCase() === '#ffffff';
   const textColor = isWhiteText ? 'text-slate-900 dark:text-white' : mapTextColor(styles.textColor);
 
   let classes: string;
   switch (variant) {
     case 'primary':
-      classes = `dark:${mapBgColor(styles.bgColor)}/5 ${mapBgColor(styles.bgColor)}/5 ${textColor} ${padding} ${radius} ${fontSize} border ${mapBorderColor(styles.bgColor)}/30 outline-none w-full focus:${mapBorderColor(styles.bgColor)} transition-colors`;
+      classes = `dark:${mapBgColor(styles.bgColor)}/5 ${mapBgColor(styles.bgColor)}/5 ${textColor} ${padding} ${radius} ${fontSize} border ${mapBorderColor(styles.bgColor)}/30 outline-none w-full focus:${mapBorderColor(styles.bgColor)} transition-colors${disabledStr}`;
       break;
     case 'secondary':
-      classes = `dark:${mapBgColor(styles.bgColor)}/10 ${mapBgColor(styles.bgColor)}/5 ${textColor} ${padding} ${radius} ${fontSize} border ${mapBorderColor(styles.bgColor)}/20 outline-none w-full focus:${mapBorderColor(styles.bgColor)} transition-colors`;
+      classes = `dark:${mapBgColor(styles.bgColor)}/10 ${mapBgColor(styles.bgColor)}/5 ${textColor} ${padding} ${radius} ${fontSize} border ${mapBorderColor(styles.bgColor)}/20 outline-none w-full focus:${mapBorderColor(styles.bgColor)} transition-colors${disabledStr}`;
       break;
     case 'outline':
-      classes = `bg-transparent ${textColor} border-2 ${mapBorderColor(styles.bgColor)} ${padding} ${radius} ${fontSize} outline-none w-full transition-colors focus:${mapBorderColor(styles.bgColor)}`;
+      classes = `bg-transparent ${textColor} border-2 ${mapBorderColor(styles.bgColor)} ${padding} ${radius} ${fontSize} outline-none w-full transition-colors focus:${mapBorderColor(styles.bgColor)}${disabledStr}`;
       break;
   }
 
-  return `<input\n  type="text"\n  placeholder="Type something..."\n  className="${classes}"\n/>`;
+  const placeholder = props.placeholder || 'Type something...';
+  const attr = props.disabled ? '\n  disabled' : '';
+
+  return `<input\n  type="text"\n  placeholder="${placeholder}"${attr}\n  className="${classes}"\n/>`;
 }
 
-export function generateBadgeCode(styles: Styles, variant: Variant): string {
+export function generateBadgeCode(styles: Styles, variant: Variant, props: Record<string, any> = {}): string {
   const radius = mapBorderRadius(styles.borderRadius);
   // Default to a smaller font for badge if not huge
   const fontSize = mapFontSize(styles.fontSize);
@@ -199,14 +217,18 @@ export function generateBadgeCode(styles: Styles, variant: Variant): string {
   let classes: string;
   switch (variant) {
     case 'primary':
-      classes = `${mapBgColor(styles.bgColor)} ${mapTextColor(styles.textColor)} ${padding} ${radius} ${fontSize} font-semibold inline-flex items-center justify-center transition-colors`;
+      classes = `${mapBgColor(styles.bgColor)} ${mapTextColor(styles.textColor)} ${padding} ${radius} ${fontSize} font-semibold inline-flex items-center justify-center transition-colors gap-1.5`;
       break;
     case 'secondary':
-      classes = `${mapBgColor(styles.bgColor)}/20 ${mapTextColor(styles.bgColor)} ${padding} ${radius} ${fontSize} font-semibold inline-flex items-center justify-center transition-colors`;
+      classes = `${mapBgColor(styles.bgColor)}/20 ${mapTextColor(styles.bgColor)} ${padding} ${radius} ${fontSize} font-semibold inline-flex items-center justify-center transition-colors gap-1.5`;
       break;
     case 'outline':
-      classes = `bg-transparent ${mapTextColor(styles.bgColor)} border-2 ${mapBorderColor(styles.bgColor)} ${padding} ${radius} ${fontSize} font-semibold inline-flex items-center justify-center transition-colors`;
+      classes = `bg-transparent ${mapTextColor(styles.bgColor)} border-2 ${mapBorderColor(styles.bgColor)} ${padding} ${radius} ${fontSize} font-semibold inline-flex items-center justify-center transition-colors gap-1.5`;
       break;
+  }
+
+  if (props.showDot) {
+    return `<span className="${classes}">\n  <span className="w-1.5 h-1.5 rounded-full bg-current"></span>\n  Badge\n</span>`;
   }
 
   return `<span className="${classes}">\n  Badge\n</span>`;
@@ -333,7 +355,7 @@ export function generateAlertCode(styles: Styles, variant: Variant): string {
 </div>`;
 }
 
-export function generateModalCode(styles: Styles, variant: Variant): string {
+export function generateModalCode(styles: Styles, variant: Variant, props: Record<string, any> = {}): string {
   const radius = mapBorderRadius(styles.borderRadius);
   const padding = mapPadding(styles.padding);
   
@@ -354,7 +376,14 @@ export function generateModalCode(styles: Styles, variant: Variant): string {
       break;
   }
 
-  return `<div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+  const blurMap: Record<string, string> = {
+    none: '',
+    sm: ' backdrop-blur-sm',
+    md: ' backdrop-blur-md'
+  };
+  const blur = blurMap[props.backdrop || 'sm'];
+
+  return `<div className="fixed inset-0 bg-black/40${blur} flex items-center justify-center p-4 z-50">
   <div className="${classes} w-full max-w-md shadow-xl">
     <div className="flex justify-between items-center mb-4">
       <h3 className="text-lg font-semibold">Modal Title</h3>
@@ -388,16 +417,20 @@ export function generateTabsCode(styles: Styles, variant: Variant): string {
 </div>`;
 }
 
-export function generateNavbarCode(styles: Styles, variant: Variant): string {
+export function generateNavbarCode(styles: Styles, variant: Variant, props: Record<string, any> = {}): string {
   const padding = mapPaddingXY(styles.padding);
   const activeBg = mapBgColor(styles.bgColor);
   const isWhiteText = styles.textColor.toLowerCase() === '#ffffff';
   const textColor = isWhiteText ? 'text-slate-900 dark:text-white' : mapTextColor(styles.textColor);
   const radius = mapBorderRadius(styles.borderRadius);
   
-  return `<nav className="w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-  <div className="flex h-14 items-center ${padding} w-full max-w-7xl mx-auto">
-    <div className="mr-4 hidden md:flex">
+  const stickyClass = props.sticky ? 'sticky top-0 z-50 ' : '';
+  const bgClass = props.transparent 
+    ? 'bg-transparent border-transparent' 
+    : 'bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60';
+  const borderClass = props.transparent ? 'border-transparent' : 'border-border/40';
+
+  let childrenContent = `<div className="mr-4 hidden md:flex">
       <a className="mr-6 flex items-center space-x-2" href="#">
         <div className="w-6 h-6 rounded-full ${activeBg}"></div>
         <span className="hidden font-bold sm:inline-block ${textColor}">Brand</span>
@@ -407,9 +440,24 @@ export function generateNavbarCode(styles: Styles, variant: Variant): string {
         <a className="transition-colors hover:text-foreground/80 text-foreground/60" href="#">Pricing</a>
         <a className="transition-colors hover:text-foreground/80 text-foreground/60" href="#">About</a>
       </nav>
+    </div>`;
+
+  if (props.mobileMenu) {
+    childrenContent = `<button className="md:hidden mr-4 p-2 -ml-2 ${textColor}">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>\n    <a className="mr-6 flex items-center space-x-2 md:hidden" href="#">
+      <div className="w-6 h-6 rounded-full ${activeBg}"></div>
+      <span className="font-bold sm:inline-block ${textColor}">Brand</span>
+    </a>\n    ` + childrenContent;
+  }
+
+  return `<nav className="${stickyClass}w-full border-b ${borderClass} ${bgClass}">
+  <div className="flex h-14 items-center justify-between ${padding} w-full max-w-7xl mx-auto">
+    <div className="flex items-center">
+      ${childrenContent}
     </div>
-    <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-      <div className="w-full flex-1 md:w-auto md:flex-none">
+    <div className="flex items-center space-x-2 md:justify-end">
+      <div className="hidden md:flex w-full md:w-auto">
         <button className="inline-flex items-center justify-center rounded-md font-medium transition-colors border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-full md:w-40 lg:w-64 text-sm text-muted-foreground justify-start">
            Search...
         </button>
@@ -456,17 +504,20 @@ export function generateToastCode(styles: Styles, variant: Variant): string {
 </div>`;
 }
 
-export function generateTableCode(styles: Styles, variant: Variant): string {
+export function generateTableCode(styles: Styles, variant: Variant, props: Record<string, any> = {}): string {
   const radius = mapBorderRadius(styles.borderRadius);
-  const padding = mapPaddingXY(styles.padding);
   const isWhiteText = styles.textColor.toLowerCase() === '#ffffff';
   const textColor = isWhiteText ? 'text-slate-900 dark:text-white' : mapTextColor(styles.textColor);
   const borderColor = mapBorderColor(styles.bgColor);
 
+  const hoverClass = props.hoverable ? ' transition-colors hover:bg-slate-100/50 dark:hover:bg-slate-800/50' : '';
+  const bodyHoverClass = props.hoverable ? ' transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50' : '';
+  const stripeClass = (props.striped ?? true) ? ' bg-slate-50/50 dark:bg-slate-800/20' : '';
+
   return `<div className="w-full overflow-auto ${radius} border ${borderColor} dark:border-slate-800">
   <table className="w-full caption-bottom text-sm">
     <thead className="[&_tr]:border-b bg-slate-50/50 dark:bg-slate-900/50">
-      <tr className="border-b transition-colors hover:bg-slate-100/50 dark:hover:bg-slate-800/50">
+      <tr className="border-b${hoverClass}">
         <th className="h-12 px-4 text-left align-middle font-medium text-slate-500 dark:text-slate-400">Invoice</th>
         <th className="h-12 px-4 text-left align-middle font-medium text-slate-500 dark:text-slate-400">Status</th>
         <th className="h-12 px-4 text-left align-middle font-medium text-slate-500 dark:text-slate-400">Method</th>
@@ -474,13 +525,13 @@ export function generateTableCode(styles: Styles, variant: Variant): string {
       </tr>
     </thead>
     <tbody className="[&_tr:last-child]:border-0">
-      <tr className="border-b transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
+      <tr className="border-b${bodyHoverClass}">
         <td className="p-4 align-middle font-medium ${textColor}">INV001</td>
         <td className="p-4 align-middle ${textColor}">Paid</td>
         <td className="p-4 align-middle ${textColor}">Credit Card</td>
         <td className="p-4 align-middle text-right ${textColor}">$250.00</td>
       </tr>
-      <tr className="border-b transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
+      <tr className="border-b${stripeClass}${bodyHoverClass}">
         <td className="p-4 align-middle font-medium ${textColor}">INV002</td>
         <td className="p-4 align-middle ${textColor}">Pending</td>
         <td className="p-4 align-middle ${textColor}">PayPal</td>
@@ -607,19 +658,20 @@ export function generateDatepickerCode(styles: Styles, variant: Variant): string
 export function generateCode(
   component: string,
   styles: Styles,
-  variant: Variant
+  variant: Variant,
+  props: Record<string, any> = {}
 ): string {
   switch (component) {
     case 'button':
-      return generateButtonCode(styles, variant);
+      return generateButtonCode(styles, variant, props);
     case 'card':
-      return generateCardCode(styles, variant);
+      return generateCardCode(styles, variant, props);
     case 'input':
-      return generateInputCode(styles, variant);
+      return generateInputCode(styles, variant, props);
     case 'badge':
-      return generateBadgeCode(styles, variant);
+      return generateBadgeCode(styles, variant, props);
     case 'avatar':
-      return generateAvatarCode(styles, variant);
+      return generateAvatarCode(styles, variant); // props ignored for now
     case 'select':
       return generateSelectCode(styles, variant);
     case 'checkbox':
@@ -627,15 +679,15 @@ export function generateCode(
     case 'alert':
       return generateAlertCode(styles, variant);
     case 'modal':
-      return generateModalCode(styles, variant);
+      return generateModalCode(styles, variant, props);
     case 'tabs':
       return generateTabsCode(styles, variant);
     case 'navbar':
-      return generateNavbarCode(styles, variant);
+      return generateNavbarCode(styles, variant, props);
     case 'toast':
       return generateToastCode(styles, variant);
     case 'table':
-      return generateTableCode(styles, variant);
+      return generateTableCode(styles, variant, props);
     case 'dropdown':
       return generateDropdownCode(styles, variant);
     case 'command':
