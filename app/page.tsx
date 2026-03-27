@@ -1,65 +1,104 @@
-import Image from "next/image";
+'use client';
+
+import React, { useEffect, useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { usePlaygroundStore } from '@/store/usePlaygroundStore';
+import ComponentSelector from '@/components/ComponentSelector';
+import ControlsPanel from '@/components/ControlsPanel';
+import LivePreview from '@/components/LivePreview';
+import CodePanel from '@/components/CodePanel';
+import ThemeToggle from '@/components/ThemeToggle';
+import ActionBar from '@/components/ActionBar';
+import { Layers } from 'lucide-react';
+
+function PlaygroundContent() {
+  const searchParams = useSearchParams();
+  const { loadFromParams, loadFromLocalStorage } = usePlaygroundStore();
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.toString()) {
+      loadFromParams(searchParams);
+    } else {
+      loadFromLocalStorage();
+    }
+    setReady(true);
+  }, [searchParams, loadFromParams, loadFromLocalStorage]);
+
+  if (!ready) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <div className="h-16 border-b border-border flex items-center px-6">
+          <div className="skeleton h-6 w-48" />
+        </div>
+        <div className="flex-1 grid grid-cols-[220px_1fr_280px] gap-4 p-4">
+          <div className="skeleton h-full" />
+          <div className="skeleton h-full" />
+          <div className="skeleton h-full" />
+        </div>
+        <div className="p-4 pt-0">
+          <div className="skeleton h-40 w-full" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col animate-fade-in">
+      {/* ── Header ── */}
+      <header className="h-16 border-b border-border flex items-center justify-between px-6 bg-surface/50 backdrop-blur-md sticky top-0 z-50">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-accent/10">
+            <Layers size={20} className="text-accent" />
+          </div>
+          <div>
+            <h1 className="text-sm font-bold gradient-text">Component Playground</h1>
+            <p className="text-xs text-muted">Visual UI Builder</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <ActionBar />
+          <div className="w-px h-6 bg-border" />
+          <ThemeToggle />
+        </div>
+      </header>
+
+      {/* ── Main Content ── */}
+      <div className="flex-1 flex flex-col lg:grid lg:grid-cols-[220px_1fr_280px] gap-4 p-4 overflow-hidden">
+        {/* Left: Component Selector */}
+        <aside className="lg:block">
+          <ComponentSelector />
+        </aside>
+
+        {/* Center: Live Preview */}
+        <main className="flex-1 min-h-0">
+          <LivePreview />
+        </main>
+
+        {/* Right: Controls Panel */}
+        <aside className="lg:max-h-[calc(100vh-7rem)] overflow-y-auto">
+          <ControlsPanel />
+        </aside>
+      </div>
+
+      {/* ── Bottom: Code Panel ── */}
+      <div className="p-4 pt-0">
+        <CodePanel />
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="skeleton h-8 w-48" />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      }
+    >
+      <PlaygroundContent />
+    </Suspense>
   );
 }
