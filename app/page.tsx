@@ -63,27 +63,30 @@ function PlaygroundContent() {
         </div>
       </header>
 
-      {/* ── Main Content ── */}
-      <div className="flex-1 flex flex-col lg:grid lg:grid-cols-[220px_1fr_280px] gap-4 p-4 overflow-hidden">
+      {/* ── Main Content flex container ── */}
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        
         {/* Left: Component Selector */}
-        <aside className="lg:block">
+        <aside className="w-full lg:w-[240px] flex-shrink-0 border-r border-border bg-surface/50 overflow-y-auto hidden lg:block">
           <ComponentSelector />
         </aside>
 
-        {/* Center: Live Preview */}
-        <main className="flex-1 min-h-0">
-          <LivePreview />
-        </main>
+        {/* Center: Live Preview & Code Panel */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+          <main className="flex-1 min-h-0 relative checkered-bg">
+            <LivePreview />
+          </main>
+          
+          {/* Bottom: Code Panel (Storybook Addons area) */}
+          <div className="h-[280px] flex-shrink-0 border-t border-border bg-surface z-10 overflow-hidden">
+            <CodePanel />
+          </div>
+        </div>
 
         {/* Right: Controls Panel */}
-        <aside className="lg:max-h-[calc(100vh-7rem)] overflow-y-auto">
+        <aside className="w-full lg:w-[320px] flex-shrink-0 border-l border-border bg-surface/50 overflow-y-auto hidden lg:block">
           <ControlsPanel />
         </aside>
-      </div>
-
-      {/* ── Bottom: Code Panel ── */}
-      <div className="p-4 pt-0">
-        <CodePanel />
       </div>
     </div>
   );

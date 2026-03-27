@@ -15,57 +15,43 @@ export default function LivePreview() {
   const currentDevice = devices.find((d) => d.id === device)!;
 
   return (
-    <div className="glass-panel flex flex-col h-full overflow-hidden">
-      {/* Device Switcher Header */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-border">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
-          Preview
-        </h2>
-        <div className="flex gap-1 p-1 bg-background rounded-lg">
-          {devices.map((d) => (
-            <button
-              key={d.id}
-              id={`device-${d.id}`}
-              onClick={() => setDevice(d.id)}
-              title={d.label}
-              className={`
-                flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium
-                transition-all duration-200 cursor-pointer
-                ${
-                  device === d.id
-                    ? 'bg-accent text-white shadow-md'
-                    : 'text-muted hover:text-foreground'
-                }
-              `}
-            >
-              {d.icon}
-              <span className="hidden sm:inline">{d.label}</span>
-            </button>
-          ))}
-        </div>
+    <div className="flex flex-col h-full w-full relative overflow-hidden">
+      {/* Device Switcher Floating Toolbar */}
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center p-1 bg-surface/90 backdrop-blur-md border border-border shadow-sm rounded-lg z-20">
+        {devices.map((d) => (
+          <button
+            key={d.id}
+            id={`device-${d.id}`}
+            onClick={() => setDevice(d.id)}
+            title={d.label}
+            className={`
+              flex items-center justify-center w-8 h-8 rounded-md transition-all duration-200 cursor-pointer
+              ${
+                device === d.id
+                  ? 'bg-accent/15 text-accent shadow-sm'
+                  : 'text-muted hover:text-foreground hover:bg-surface-hover'
+              }
+            `}
+          >
+            {d.icon}
+          </button>
+        ))}
       </div>
 
       {/* Preview Area */}
-      <div className="flex-1 flex items-center justify-center p-6 dot-grid">
+      <div className="flex-1 flex flex-col items-center p-6 mt-12 overflow-y-auto w-full">
         <div
-          className="transition-all duration-300 ease-out flex items-center justify-center min-h-[300px]"
+          className="transition-all duration-300 ease-out flex items-center mx-auto"
           style={{
             width: currentDevice.width,
             maxWidth: '100%',
           }}
         >
-          <div className="glass-panel glow-accent p-8 w-full flex items-center justify-center min-h-[250px]">
+          {/* Inner Content Wrapper */}
+          <div className="bg-surface border border-border/50 shadow-sm w-full min-h-[400px] flex items-center justify-center overflow-x-hidden">
             <PreviewComponents />
           </div>
         </div>
-      </div>
-
-      {/* Footer */}
-      <div className="px-5 py-2 border-t border-border flex items-center justify-between">
-        <span className="text-xs text-muted">
-          {currentDevice.width === '100%' ? 'Full width' : currentDevice.width}
-        </span>
-        <span className="text-xs text-muted capitalize">{device}</span>
       </div>
     </div>
   );
