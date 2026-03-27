@@ -130,7 +130,7 @@ export default function CodePanel() {
   const handleDownload = useCallback(() => {
     const componentName = selectedComponent.charAt(0).toUpperCase() + selectedComponent.slice(1);
     const fileContent = `import React from 'react';\n\nexport default function ${componentName}Component() {\n  return (\n    ${code.split('\\n').join('\\n    ')}\n  );\n}\n`;
-    
+
     const blob = new Blob([fileContent], { type: 'text/javascript' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -140,7 +140,7 @@ export default function CodePanel() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
+
     setDownloaded(true);
     setTimeout(() => setDownloaded(false), 2000);
   }, [code, selectedComponent]);
@@ -165,10 +165,9 @@ export default function CodePanel() {
             className={`
               flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium
               transition-all duration-200 cursor-pointer
-              ${
-                downloaded
-                  ? 'bg-emerald-500/15 text-emerald-400'
-                  : 'bg-surface-hover text-muted hover:text-foreground border border-border'
+              ${downloaded
+                ? 'bg-emerald-500/15 text-emerald-400'
+                : 'bg-surface-hover text-muted hover:text-foreground border border-border'
               }
             `}
           >
@@ -191,10 +190,9 @@ export default function CodePanel() {
             className={`
               flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium
               transition-all duration-200 cursor-pointer
-              ${
-                copied
-                  ? 'bg-emerald-500/15 text-emerald-400'
-                  : 'bg-accent text-white hover:bg-accent/90 shadow-md'
+              ${copied
+                ? 'bg-emerald-500/15 text-emerald-400'
+                : 'bg-accent text-white hover:bg-accent/90 shadow-md'
               }
             `}
           >
