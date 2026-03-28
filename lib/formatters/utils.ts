@@ -44,11 +44,21 @@ export function buildCSSFromStyles(styles: Styles, variant: Variant, component: 
     if (props.fullWidth) {
       css['width'] = '100%';
     }
-    if (props.loading || props.withIcon) {
+    if (styles.width && styles.width !== 'auto' && !props.fullWidth) css['width'] = `${styles.width}px`;
+    if (styles.height && styles.height !== 'auto') css['height'] = `${styles.height}px`;
+    if (styles.letterSpacing && styles.letterSpacing !== 'normal') css['letter-spacing'] = `${styles.letterSpacing}px`;
+
+    // Ensure flex is used if width/height are specified or icon is present
+    if (props.loading || (props.icon && props.icon !== 'none') || (styles.width && styles.width !== 'auto') || (styles.height && styles.height !== 'auto')) {
       css['display'] = 'flex';
       css['align-items'] = 'center';
       css['justify-content'] = 'center';
-      css['gap'] = '8px';
+    }
+    if (props.loading || (props.icon && props.icon !== 'none')) {
+      css['gap'] = `${styles.gap || 8}px`;
+      if (props.iconPosition === 'right' && !props.loading) {
+        css['flex-direction'] = 'row-reverse';
+      }
     }
   } else if (component === 'card') {
     css['max-width'] = '320px';
@@ -206,12 +216,37 @@ export function getComponentContent(component: string, props: Record<string, any
     case 'button':
       const btnIsDisabled = props.disabled || props.loading;
       const btnAttr = btnIsDisabled ? ' disabled' : '';
-      let btnChildren = props.text || 'Click me';
+      const textNode = props.text || 'Click me';
+      let svgNode = '';
+      
+      const svgMap: Record<string, string> = {
+        search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+        plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+        trash: '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>',
+        download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>',
+        edit: '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>',
+        check: '<polyline points="20 6 9 17 4 12"/>',
+        x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+        arrowRight: '<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>',
+        arrowLeft: '<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>'
+      };
+
       if (props.loading) {
-        btnChildren = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>\n  ${btnChildren}`;
-      } else if (props.withIcon) {
-        btnChildren = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>\n  ${btnChildren}`;
+        svgNode = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>';
+      } else if (props.icon && props.icon !== 'none' && svgMap[props.icon]) {
+        svgNode = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${svgMap[props.icon]}</svg>`;
       }
+
+      let btnChildren = textNode;
+      if (svgNode) {
+        // Output with explicit spacing node if the framework doesn't rely entirely on flex-gap, but we enforce gap in CSS anyway.
+        if (props.iconPosition === 'right' && !props.loading) {
+          btnChildren = `${textNode}\n  ${svgNode}`;
+        } else {
+          btnChildren = `${svgNode}\n  ${textNode}`;
+        }
+      }
+
       return { tag: 'button', selfClosing: false, children: btnChildren, attrs: btnAttr };
     case 'card':
       return { tag: 'div', selfClosing: false, children: '<h3>Card Title</h3>\n  <p>This is a description for the card component.</p>', attrs: '' };

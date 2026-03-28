@@ -4,16 +4,25 @@ import { create } from 'zustand';
 import type { CodeFormat } from '@/lib/codeFormatGenerator';
 
 export type ComponentType = 'button' | 'card' | 'input' | 'badge' | 'avatar' | 'select' | 'checkbox' | 'alert' | 'modal' | 'tabs' | 'navbar' | 'toast' | 'table' | 'dropdown' | 'command' | 'datepicker';
-export type Variant = 'primary' | 'secondary' | 'outline';
+export type Variant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive' | 'link';
 export type Device = 'mobile' | 'tablet' | 'desktop';
 export type PreviewBg = 'dots' | 'checkered' | 'surface' | 'white' | 'dark';
 
 export interface Styles {
   bgColor: string;
   textColor: string;
+  borderColor: string;
+  hoverBgColor: string;
+  boxShadowColor: string;
   padding: string;
   borderRadius: string;
   fontSize: string;
+  width: string;
+  height: string;
+  gap: string;
+  borderWidth: string;
+  letterSpacing: string;
+  fontWeight: string;
 }
 
 export interface HistoryState {
@@ -57,9 +66,18 @@ interface PlaygroundState {
 const defaultStyles: Styles = {
   bgColor: '#6366f1',
   textColor: '#ffffff',
+  borderColor: '#6366f1',
+  hoverBgColor: '#4f46e5',
+  boxShadowColor: '#000000',
   padding: '12',
   borderRadius: '8',
   fontSize: '16',
+  width: 'auto',
+  height: 'auto',
+  gap: '8',
+  borderWidth: '0',
+  letterSpacing: '0',
+  fontWeight: '600',
 };
 
 export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
@@ -68,7 +86,7 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
   variant: 'primary',
   componentProps: {
     // Defaults for specific components
-    button: { disabled: false, text: 'Click me', loading: false, fullWidth: false, withIcon: false },
+    button: { disabled: false, text: 'Click me', loading: false, fullWidth: false, withIcon: false, icon: 'none', iconPosition: 'left', buttonType: 'button', onClickAction: 'console', ariaLabel: '', pillShape: false, shadowPreset: 'none', transition: true },
     card: { shadow: 'md' },
     input: { disabled: false, placeholder: 'Type something...' },
     badge: { showDot: false },
@@ -88,7 +106,7 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
   resetStyles: () => {
     get().saveHistory();
     set({ styles: { ...defaultStyles }, variant: 'primary', componentProps: {
-      button: { disabled: false, text: 'Click me', loading: false, fullWidth: false, withIcon: false },
+      button: { disabled: false, text: 'Click me', loading: false, fullWidth: false, withIcon: false, icon: 'none', iconPosition: 'left', buttonType: 'button', onClickAction: 'console', ariaLabel: '', pillShape: false, shadowPreset: 'none', transition: true },
       card: { shadow: 'md' },
       input: { disabled: false, placeholder: 'Type something...' },
       badge: { showDot: false },
@@ -192,6 +210,7 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
       selectedComponent: component || state.selectedComponent,
       variant: variant || state.variant,
       styles: {
+        ...state.styles,
         bgColor: bgColor ? `#${bgColor}` : state.styles.bgColor,
         textColor: textColor ? `#${textColor}` : state.styles.textColor,
         padding: padding || state.styles.padding,

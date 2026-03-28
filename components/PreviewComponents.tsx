@@ -23,7 +23,7 @@ export default function PreviewComponents() {
   const { selectedComponent } = usePlaygroundStore();
 
   return (
-    <div className="flex items-center justify-center min-h-[200px] w-full">
+    <div className="flex items-center justify-center min-h-[200px] w-full p-2 md:p-4">
       {selectedComponent === 'button' && <ButtonPreview />}
       {selectedComponent === 'card' && <CardPreview />}
       {selectedComponent === 'input' && <InputPreview />}
