@@ -15,7 +15,7 @@ import { Layers } from 'lucide-react';
 function PlaygroundContent() {
   const searchParams = useSearchParams();
   const { loadFromParams, loadFromLocalStorage } = usePlaygroundStore();
-  
+
   // Initialize keyboard shortcuts
   useKeyboardShortcuts();
 
@@ -102,7 +102,7 @@ function PlaygroundContent() {
             <Layers size={20} className="text-accent" />
           </div>
           <div>
-            <h1 className="text-sm font-bold gradient-text whitespace-nowrap">Component Playground</h1>
+            <h1 className="text-sm font-bold gradient-text whitespace-nowrap">Compora</h1>
             <p className="text-xs text-muted hidden sm:block">Visual UI Builder</p>
           </div>
         </div>

@@ -3,6 +3,14 @@
 import { usePlaygroundStore, type Variant } from '@/store/usePlaygroundStore';
 import { RotateCcw } from 'lucide-react';
 
+import { ButtonControls } from './controls/ButtonControls';
+import { CardControls } from './controls/CardControls';
+import { InputControls } from './controls/InputControls';
+import { BadgeControls } from './controls/BadgeControls';
+import { ModalControls } from './controls/ModalControls';
+import { NavbarControls } from './controls/NavbarControls';
+import { TableControls } from './controls/TableControls';
+
 const variants: Variant[] = ['primary', 'secondary', 'outline'];
 
 export default function ControlsPanel() {
@@ -177,166 +185,16 @@ export default function ControlsPanel() {
       <div className="flex flex-col gap-4">
         <label className="text-xs font-medium text-muted capitalize">{selectedComponent} Config</label>
         
-        {/* Component: Button */}
-        {selectedComponent === 'button' && (
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <label className="text-xs text-foreground/80">Disabled</label>
-              <input 
-                type="checkbox" 
-                checked={props.disabled || false} 
-                onChange={(e) => updateComponentProp('disabled', e.target.checked)}
-                className="w-4 h-4 rounded border-border bg-surface text-accent focus:ring-accent accent-accent rounded-sm cursor-pointer"
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <label className="text-xs text-foreground/80">Text</label>
-              <input 
-                type="text" 
-                value={props.text || ''} 
-                onChange={(e) => updateComponentProp('text', e.target.value)}
-                className="text-xs rounded border border-border bg-surface px-2 py-1 w-24 text-right focus:border-accent focus:outline-none placeholder:text-muted/50"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Component: Card */}
-        {selectedComponent === 'card' && (
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <label className="text-xs text-foreground/80">Shadow</label>
-              <select
-                value={props.shadow || 'md'}
-                onChange={(e) => updateComponentProp('shadow', e.target.value)}
-                className="text-xs rounded border border-border bg-surface px-2 py-1 w-24 outline-none focus:border-accent cursor-pointer"
-              >
-                <option value="none">None</option>
-                <option value="sm">Small</option>
-                <option value="md">Medium</option>
-                <option value="lg">Large</option>
-                <option value="xl">X-Large</option>
-              </select>
-            </div>
-          </div>
-        )}
-
-        {/* Component: Input */}
-        {selectedComponent === 'input' && (
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <label className="text-xs text-foreground/80">Disabled</label>
-              <input 
-                type="checkbox" 
-                checked={props.disabled || false} 
-                onChange={(e) => updateComponentProp('disabled', e.target.checked)}
-                className="w-4 h-4 rounded border-border bg-surface text-accent focus:ring-accent accent-accent rounded-sm cursor-pointer"
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <label className="text-xs text-foreground/80">Placeholder</label>
-              <input 
-                type="text" 
-                value={props.placeholder || ''} 
-                onChange={(e) => updateComponentProp('placeholder', e.target.value)}
-                className="text-xs rounded border border-border bg-surface px-2 py-1 w-32 text-right focus:border-accent focus:outline-none"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Component: Badge */}
-        {selectedComponent === 'badge' && (
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <label className="text-xs text-foreground/80">Show Dot</label>
-              <input 
-                type="checkbox" 
-                checked={props.showDot || false} 
-                onChange={(e) => updateComponentProp('showDot', e.target.checked)}
-                className="w-4 h-4 rounded border-border bg-surface text-accent focus:ring-accent accent-accent rounded-sm cursor-pointer"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Component: Modal */}
-        {selectedComponent === 'modal' && (
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <label className="text-xs text-foreground/80">Backdrop Blur</label>
-              <select
-                value={props.backdrop || 'sm'}
-                onChange={(e) => updateComponentProp('backdrop', e.target.value)}
-                className="text-xs rounded border border-border bg-surface px-2 py-1 w-24 outline-none focus:border-accent cursor-pointer"
-              >
-                <option value="none">None</option>
-                <option value="sm">Small</option>
-                <option value="md">Medium</option>
-              </select>
-            </div>
-          </div>
-        )}
-
-        {/* Component: Navbar */}
-        {selectedComponent === 'navbar' && (
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <label className="text-xs text-foreground/80">Sticky</label>
-              <input 
-                type="checkbox" 
-                checked={props.sticky || false} 
-                onChange={(e) => updateComponentProp('sticky', e.target.checked)}
-                className="w-4 h-4 rounded border-border bg-surface text-accent focus:ring-accent accent-accent rounded-sm cursor-pointer"
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <label className="text-xs text-foreground/80">Transparent</label>
-              <input 
-                type="checkbox" 
-                checked={props.transparent || false} 
-                onChange={(e) => updateComponentProp('transparent', e.target.checked)}
-                className="w-4 h-4 rounded border-border bg-surface text-accent focus:ring-accent accent-accent rounded-sm cursor-pointer"
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <label className="text-xs text-foreground/80">Mobile Menu</label>
-              <input 
-                type="checkbox" 
-                checked={props.mobileMenu || false} 
-                onChange={(e) => updateComponentProp('mobileMenu', e.target.checked)}
-                className="w-4 h-4 rounded border-border bg-surface text-accent focus:ring-accent accent-accent rounded-sm cursor-pointer"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Component: Table */}
-        {selectedComponent === 'table' && (
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <label className="text-xs text-foreground/80">Striped Rows</label>
-              <input 
-                type="checkbox" 
-                checked={props.striped ?? true} 
-                onChange={(e) => updateComponentProp('striped', e.target.checked)}
-                className="w-4 h-4 rounded border-border bg-surface text-accent focus:ring-accent accent-accent rounded-sm cursor-pointer"
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <label className="text-xs text-foreground/80">Hover effect</label>
-              <input 
-                type="checkbox" 
-                checked={props.hoverable ?? true} 
-                onChange={(e) => updateComponentProp('hoverable', e.target.checked)}
-                className="w-4 h-4 rounded border-border bg-surface text-accent focus:ring-accent accent-accent rounded-sm cursor-pointer"
-              />
-            </div>
-          </div>
-        )}
+        {selectedComponent === 'button' && <ButtonControls props={props} updateComponentProp={updateComponentProp} />}
+        {selectedComponent === 'card' && <CardControls props={props} updateComponentProp={updateComponentProp} />}
+        {selectedComponent === 'input' && <InputControls props={props} updateComponentProp={updateComponentProp} />}
+        {selectedComponent === 'badge' && <BadgeControls props={props} updateComponentProp={updateComponentProp} />}
+        {selectedComponent === 'modal' && <ModalControls props={props} updateComponentProp={updateComponentProp} />}
+        {selectedComponent === 'navbar' && <NavbarControls props={props} updateComponentProp={updateComponentProp} />}
+        {selectedComponent === 'table' && <TableControls props={props} updateComponentProp={updateComponentProp} />}
 
         {/* Fallback for components without custom controls yet */}
-        {['button', 'card', 'input', 'badge', 'modal', 'table'].indexOf(selectedComponent) === -1 && (
+        {['button', 'card', 'input', 'badge', 'modal', 'navbar', 'table'].indexOf(selectedComponent) === -1 && (
           <p className="text-[11px] text-muted/70 italic">
             More controls available soon.
           </p>
