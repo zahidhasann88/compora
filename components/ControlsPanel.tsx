@@ -6,6 +6,7 @@ import { RotateCcw } from 'lucide-react';
 import { ButtonControls } from './controls/ButtonControls';
 import { CardControls } from './controls/CardControls';
 import { InputControls } from './controls/InputControls';
+import { SelectControls } from './controls/SelectControls';
 import { BadgeControls } from './controls/BadgeControls';
 import { ModalControls } from './controls/ModalControls';
 import { NavbarControls } from './controls/NavbarControls';
@@ -20,7 +21,7 @@ export default function ControlsPanel() {
   const props = componentProps[selectedComponent] || {};
 
   return (
-    <div className="py-5 px-5 flex flex-col gap-6 h-full overflow-y-auto">
+    <div className="py-5 pl-5 pr-3 flex flex-col gap-6 h-full overflow-y-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
       <div className="flex items-center justify-between">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
           Properties
@@ -34,7 +35,7 @@ export default function ControlsPanel() {
         </button>
       </div>
 
-      {selectedComponent !== 'input' && (
+      {selectedComponent !== 'input' && selectedComponent !== 'select' && (
         <>
           {/* ── Variant Toggle ── */}
           <div className="flex flex-col gap-1.5">
@@ -184,13 +185,14 @@ export default function ControlsPanel() {
         {selectedComponent === 'button' && <ButtonControls props={props} updateComponentProp={updateComponentProp} />}
         {selectedComponent === 'card' && <CardControls props={props} updateComponentProp={updateComponentProp} />}
         {selectedComponent === 'input' && <InputControls props={props} updateComponentProp={updateComponentProp} />}
+        {selectedComponent === 'select' && <SelectControls props={props} updateComponentProp={updateComponentProp} />}
         {selectedComponent === 'badge' && <BadgeControls props={props} updateComponentProp={updateComponentProp} />}
         {selectedComponent === 'modal' && <ModalControls props={props} updateComponentProp={updateComponentProp} />}
         {selectedComponent === 'navbar' && <NavbarControls props={props} updateComponentProp={updateComponentProp} />}
         {selectedComponent === 'table' && <TableControls props={props} updateComponentProp={updateComponentProp} />}
 
         {/* Fallback for components without custom controls yet */}
-        {['button', 'card', 'input', 'badge', 'modal', 'navbar', 'table'].indexOf(selectedComponent) === -1 && (
+        {['button', 'card', 'input', 'select', 'badge', 'modal', 'navbar', 'table'].indexOf(selectedComponent) === -1 && (
           <p className="text-[11px] text-muted/70 italic">
             More controls available soon.
           </p>

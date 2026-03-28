@@ -35,7 +35,7 @@ export function generateCode(
     case 'avatar':
       return generateAvatarCode(styles, variant); // props ignored for now
     case 'select':
-      return generateSelectCode(styles, variant);
+      return generateSelectCode(styles, variant, props);
     case 'checkbox':
       return generateCheckboxCode(styles, variant);
     case 'alert':

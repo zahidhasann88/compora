@@ -137,6 +137,46 @@ export function buildCSSFromStyles(styles: Styles, variant: Variant, component: 
       css['display'] = 'flex';
       css['align-items'] = 'center';
     }
+  } else if (component === 'select') {
+    const selectVariant = props.selectVariant || 'outlined';
+    const borderW = Number(styles.borderWidth) || 1;
+    css['display'] = 'flex';
+    css['align-items'] = 'center';
+    css['justify-content'] = 'space-between';
+    css['gap'] = '8px';
+    css['outline'] = 'none';
+    css['cursor'] = props.disabled ? 'not-allowed' : 'pointer';
+    css['width'] = styles.width && styles.width !== 'auto' ? `${styles.width}px` : '320px';
+    css['font-family'] = 'inherit';
+    css['color'] = styles.textColor;
+    css['font-weight'] = props.selectFontWeight || '400';
+    css['text-align'] = props.textAlign || 'left';
+    if (styles.height && styles.height !== 'auto') css['min-height'] = `${styles.height}px`;
+    switch (selectVariant) {
+      case 'outlined':
+        css['background-color'] = `${styles.bgColor}0d`;
+        css['border'] = `${borderW}px solid ${props.errorState ? '#ef4444' : styles.borderColor}`;
+        css['border-radius'] = `${styles.borderRadius}px`;
+        break;
+      case 'filled':
+        css['background-color'] = `${styles.bgColor}1a`;
+        css['border'] = 'none';
+        css['border-bottom'] = `2px solid ${props.errorState ? '#ef4444' : styles.borderColor}`;
+        css['border-radius'] = `${styles.borderRadius}px`;
+        break;
+      case 'underline':
+        css['background-color'] = 'transparent';
+        css['border'] = 'none';
+        css['border-bottom'] = `2px solid ${props.errorState ? '#ef4444' : styles.borderColor}`;
+        css['border-radius'] = '0';
+        break;
+      case 'unstyled':
+        css['background-color'] = 'transparent';
+        css['border'] = 'none';
+        css['border-radius'] = '0';
+        break;
+    }
+    if (props.disabled) css['opacity'] = '0.5';
   } else if (component === 'badge') {
     css['padding'] = `${Math.max(4, Number(styles.padding) / 2)}px ${styles.padding}px`;
     css['font-weight'] = '600';
@@ -334,6 +374,44 @@ export function getComponentContent(component: string, props: Record<string, any
       }
 
       return { tag: 'div', selfClosing: false, children: children.join('\n  '), attrs: '' };
+    }
+    case 'select': {
+      const s = styles || { bgColor: '#6366f1', textColor: '#ffffff', borderColor: '#6366f1', padding: '12', borderRadius: '8', fontSize: '16', width: 'auto', height: 'auto' } as Styles;
+      const selectOpts = props.options || [
+        { label: 'Option 1', value: 'option-1' },
+        { label: 'Option 2', value: 'option-2' },
+        { label: 'Option 3', value: 'option-3' },
+      ];
+      let parts: string[] = [];
+
+      // Label
+      if (props.label) {
+        const req = props.required ? '<span style="color:#ef4444;margin-left:3px;">*</span>' : '';
+        parts.push(`<label style="font-size:${Math.max(Number(s.fontSize) - 2, 11)}px;font-weight:500;color:${props.labelColor || '#e4e4e7'};margin-bottom:6px;display:block;">${props.label}${req}</label>`);
+      }
+
+      // Trigger
+      const chevronSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>';
+      parts.push(`<button type="button" onclick="this.nextElementSibling.classList.toggle('hidden')" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;cursor:pointer;">`);
+      parts.push(`  <span>${props.placeholder || 'Select an option...'}</span>`);
+      parts.push(`  <span style="color:#9ca3af;">${chevronSvg}</span>`);
+      parts.push(`</button>`);
+
+      // Dropdown
+      parts.push(`<div class="hidden" style="background:${props.dropdownBg || '#1e1e2e'};border:1px solid ${s.borderColor}33;border-radius:${s.borderRadius}px;max-height:${props.dropdownMaxHeight || 300}px;overflow-y:auto;margin-top:4px;padding:4px;box-shadow:0 10px 25px rgba(0,0,0,0.3);">`);
+      selectOpts.forEach((opt: any) => {
+        parts.push(`  <div style="padding:${props.optionPadding || 8}px;font-size:${props.optionFontSize || 14}px;cursor:pointer;border-radius:4px;" onmouseover="this.style.backgroundColor='${props.optionHoverBg || '#2a2a3e'}'" onmouseout="this.style.backgroundColor='transparent'">${opt.label}</div>`);
+      });
+      parts.push(`</div>`);
+
+      // Error / helper
+      if (props.errorState && props.errorMessage) {
+        parts.push(`<p style="font-size:12px;color:#ef4444;margin:4px 0 0;">${props.errorMessage}</p>`);
+      } else if (props.helperText) {
+        parts.push(`<p style="font-size:12px;color:#9ca3af;margin:4px 0 0;">${props.helperText}</p>`);
+      }
+
+      return { tag: 'div', selfClosing: false, children: parts.join('\n  '), attrs: ' style="position:relative;"' };
     }
     case 'badge':
       const badgeChildren = props.showDot 
