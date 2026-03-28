@@ -1,0 +1,104 @@
+export function mapBgColor(hex: string): string {
+  const map: Record<string, string> = {
+    '#6366f1': 'bg-indigo-500',
+    '#3b82f6': 'bg-blue-500',
+    '#8b5cf6': 'bg-violet-500',
+    '#ec4899': 'bg-pink-500',
+    '#ef4444': 'bg-red-500',
+    '#f97316': 'bg-orange-500',
+    '#eab308': 'bg-yellow-500',
+    '#22c55e': 'bg-green-500',
+    '#14b8a6': 'bg-teal-500',
+    '#06b6d4': 'bg-cyan-500',
+    '#000000': 'bg-black',
+    '#ffffff': 'bg-white',
+    'transparent': 'bg-transparent',
+  };
+  return map[hex.toLowerCase()] || `bg-[${hex}]`;
+}
+
+export function mapTextColor(hex: string): string {
+  const map: Record<string, string> = {
+    '#ffffff': 'text-white',
+    '#000000': 'text-black',
+    '#6366f1': 'text-indigo-500',
+    '#3b82f6': 'text-blue-500',
+    '#8b5cf6': 'text-violet-500',
+    '#ec4899': 'text-pink-500',
+    '#ef4444': 'text-red-500',
+    '#f97316': 'text-orange-500',
+    '#eab308': 'text-yellow-500',
+    '#22c55e': 'text-green-500',
+    '#14b8a6': 'text-teal-500',
+    '#06b6d4': 'text-cyan-500',
+  };
+  return map[hex.toLowerCase()] || `text-[${hex}]`;
+}
+
+export function mapPadding(px: string): string {
+  const val = Number(px);
+  const map: Record<number, string> = {
+    4: 'p-1', 8: 'p-2', 10: 'p-2.5', 12: 'p-3', 14: 'p-3.5',
+    16: 'p-4', 20: 'p-5', 24: 'p-6', 28: 'p-7', 32: 'p-8',
+    36: 'p-9', 40: 'p-10', 44: 'p-11', 48: 'p-12',
+  };
+  return map[val] || `p-[${val}px]`;
+}
+
+export function mapPaddingXY(value: string): string {
+  const val = Number(value);
+  const pyMap: Record<number, string> = {
+    4: 'py-1', 8: 'py-2', 10: 'py-2.5', 12: 'py-3', 14: 'py-3.5',
+    16: 'py-4', 20: 'py-5', 24: 'py-6', 28: 'py-7', 32: 'py-8',
+    36: 'py-9', 40: 'py-10', 44: 'py-11', 48: 'py-12',
+  };
+  const pxVal = val * 2;
+  const pxMap: Record<number, string> = {
+    8: 'px-2', 16: 'px-4', 20: 'px-5', 24: 'px-6', 28: 'px-7',
+    32: 'px-8', 40: 'px-10', 48: 'px-12', 56: 'px-14', 64: 'px-16',
+    72: 'px-18', 80: 'px-20', 88: 'px-22', 96: 'px-24',
+  };
+  const py = pyMap[val] || `py-[${val}px]`;
+  const pxClass = pxMap[pxVal] || `px-[${pxVal}px]`;
+  return `${pxClass} ${py}`;
+}
+
+export function mapBorderRadius(value: string): string {
+  const val = Number(value);
+  if (val === 0) return 'rounded-none';
+  if (val <= 2) return 'rounded-sm';
+  if (val <= 4) return 'rounded';
+  if (val <= 6) return 'rounded-md';
+  if (val <= 8) return 'rounded-lg';
+  if (val <= 12) return 'rounded-xl';
+  if (val <= 16) return 'rounded-2xl';
+  if (val <= 24) return 'rounded-3xl';
+  if (val >= 50) return 'rounded-full';
+  return `rounded-[${val}px]`;
+}
+
+export function mapFontSize(px: string): string {
+  const val = Number(px);
+  const map: Record<number, string> = {
+    10: 'text-[10px]', 12: 'text-xs', 14: 'text-sm', 16: 'text-base',
+    18: 'text-lg', 20: 'text-xl', 24: 'text-2xl', 28: 'text-[28px]',
+    30: 'text-3xl', 32: 'text-[32px]',
+  };
+  return map[val] || `text-[${val}px]`;
+}
+
+export function mapBorderColor(hex: string): string {
+  const map: Record<string, string> = {
+    '#6366f1': 'border-indigo-500',
+    '#3b82f6': 'border-blue-500',
+    '#8b5cf6': 'border-violet-500',
+    '#ec4899': 'border-pink-500',
+    '#ef4444': 'border-red-500',
+    '#f97316': 'border-orange-500',
+    '#eab308': 'border-yellow-500',
+    '#22c55e': 'border-green-500',
+    '#14b8a6': 'border-teal-500',
+    '#06b6d4': 'border-cyan-500',
+  };
+  return map[hex.toLowerCase()] || `border-[${hex}]`;
+}
