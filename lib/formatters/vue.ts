@@ -3,7 +3,7 @@ import { buildCSSFromStyles, getComponentContent, cssObjectToString, capitalize 
 
 export function generateVueSFC(component: string, styles: Styles, variant: Variant, props: Record<string, any> = {}): string {
   const css = buildCSSFromStyles(styles, variant, component, props);
-  const { tag, selfClosing, children, attrs } = getComponentContent(component, props);
+  const { tag, selfClosing, children, attrs } = getComponentContent(component, props, styles);
   const componentName = capitalize(component);
   const className = `${component}-${variant}`;
 

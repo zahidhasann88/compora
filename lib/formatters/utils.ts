@@ -88,30 +88,54 @@ export function buildCSSFromStyles(styles: Styles, variant: Variant, component: 
       css['box-shadow'] = shadowMap[props.shadow];
     }
   } else if (component === 'input') {
+    const inputVariant = props.inputVariant || 'outlined';
+    const borderW = Number(styles.borderWidth) || 1;
     css['outline'] = 'none';
-    css['width'] = '100%';
-    css['max-width'] = '320px';
+    css['width'] = styles.width && styles.width !== 'auto' ? `${styles.width}px` : '320px';
     css['font-family'] = 'inherit';
-    switch (variant) {
-      case 'primary':
+    css['color'] = styles.textColor;
+    css['font-weight'] = props.inputFontWeight || '400';
+    css['text-align'] = props.textAlign || 'left';
+    if (styles.letterSpacing && styles.letterSpacing !== 'normal' && styles.letterSpacing !== '0') {
+      css['letter-spacing'] = `${styles.letterSpacing}px`;
+    }
+    if (styles.height && styles.height !== 'auto') css['height'] = `${styles.height}px`;
+    if (props.errorState) {
+      css['border-color'] = '#ef4444';
+    }
+    switch (inputVariant) {
+      case 'outlined':
         css['background-color'] = `${styles.bgColor}0d`;
-        css['color'] = styles.textColor;
-        css['border'] = `1px solid ${styles.bgColor}44`;
+        css['border'] = `${borderW}px solid ${props.errorState ? '#ef4444' : styles.borderColor}`;
+        css['border-radius'] = `${styles.borderRadius}px`;
         break;
-      case 'secondary':
+      case 'filled':
         css['background-color'] = `${styles.bgColor}1a`;
-        css['color'] = styles.textColor;
-        css['border'] = `1px solid ${styles.bgColor}33`;
+        css['border'] = 'none';
+        css['border-bottom'] = `2px solid ${props.errorState ? '#ef4444' : styles.borderColor}`;
+        css['border-radius'] = `${styles.borderRadius}px`;
         break;
-      case 'outline':
+      case 'underline':
         css['background-color'] = 'transparent';
-        css['color'] = styles.textColor;
-        css['border'] = `2px solid ${styles.bgColor}`;
+        css['border'] = 'none';
+        css['border-bottom'] = `2px solid ${props.errorState ? '#ef4444' : styles.borderColor}`;
+        css['border-radius'] = '0';
+        break;
+      case 'unstyled':
+        css['background-color'] = 'transparent';
+        css['border'] = 'none';
+        css['border-radius'] = '0';
         break;
     }
     if (props.disabled) {
       css['opacity'] = '0.5';
       css['cursor'] = 'not-allowed';
+    }
+    // For icon/addon layouts, use wrapper approach
+    const hasIcons = (props.leftIcon && props.leftIcon !== 'none') || (props.rightIcon && props.rightIcon !== 'none') || props.loading || props.successState;
+    if (hasIcons || props.leftAddon || props.rightAddon) {
+      css['display'] = 'flex';
+      css['align-items'] = 'center';
     }
   } else if (component === 'badge') {
     css['padding'] = `${Math.max(4, Number(styles.padding) / 2)}px ${styles.padding}px`;
@@ -209,7 +233,7 @@ export function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function getComponentContent(component: string, props: Record<string, any> = {}): { tag: string; selfClosing: boolean; children: string; attrs: string } {
+export function getComponentContent(component: string, props: Record<string, any> = {}, styles?: Styles): { tag: string; selfClosing: boolean; children: string; attrs: string } {
   const disabledAttr = props.disabled ? ' disabled' : '';
 
   switch (component) {
@@ -250,8 +274,67 @@ export function getComponentContent(component: string, props: Record<string, any
       return { tag: 'button', selfClosing: false, children: btnChildren, attrs: btnAttr };
     case 'card':
       return { tag: 'div', selfClosing: false, children: '<h3>Card Title</h3>\n  <p>This is a description for the card component.</p>', attrs: '' };
-    case 'input':
-      return { tag: 'input', selfClosing: true, children: '', attrs: ` type="text" placeholder="${props.placeholder || 'Type something...'}"${disabledAttr}` };
+    case 'input': {
+      const s = styles || { bgColor: '#6366f1', textColor: '#ffffff', borderColor: '#6366f1', hoverBgColor: '#4f46e5', boxShadowColor: '#000000', padding: '12', borderRadius: '8', fontSize: '16', width: 'auto', height: 'auto', gap: '8', borderWidth: '0', letterSpacing: '0', fontWeight: '600' };
+      const inputAttrs: string[] = [];
+      inputAttrs.push(` type="${props.inputType || 'text'}"`);
+      inputAttrs.push(` placeholder="${props.placeholder || 'Enter text...'}"`);
+      if (props.disabled) inputAttrs.push(' disabled');
+      if (props.readOnly) inputAttrs.push(' readonly');
+      if (props.required) inputAttrs.push(' required');
+      if (props.charCount) inputAttrs.push(` maxlength="${props.maxLength || 100}"`);
+      if (props.ariaLabel) inputAttrs.push(` aria-label="${props.ariaLabel}"`);
+      if (props.autocomplete && props.autocomplete !== 'off') inputAttrs.push(` autocomplete="${props.autocomplete}"`);
+      if (props.defaultValue) inputAttrs.push(` value="${props.defaultValue}"`);
+
+      const inputSvgMap: Record<string, string> = {
+        search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+        mail: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+        lock: '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+        user: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+        phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>',
+        calendar: '<rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/>',
+        eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+      };
+
+      const makeSvg = (icon: string) => `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${inputSvgMap[icon] || ''}</svg>`;
+
+      let children: string[] = [];
+
+      // Label
+      if (props.label) {
+        const req = props.required ? '<span style="color:#ef4444;margin-left:3px;">*</span>' : '';
+        children.push(`<label style="font-size:${Math.max(Number(s.fontSize) - 2, 11)}px;font-weight:500;color:${props.labelColor || '#e4e4e7'};margin-bottom:6px;display:block;">${props.label}${req}</label>`);
+      }
+
+      // Wrapper open with input inside
+      let inputInner: string[] = [];
+      if (props.leftAddon) inputInner.push(`<span style="padding:${s.padding}px;background:rgba(0,0,0,0.1);color:#9ca3af;border-right:1px solid ${s.borderColor}33;">${props.leftAddon}</span>`);
+      if (props.leftIcon && props.leftIcon !== 'none' && inputSvgMap[props.leftIcon]) {
+        inputInner.push(`<span style="padding-left:${s.padding}px;display:flex;align-items:center;color:#9ca3af;">${makeSvg(props.leftIcon)}</span>`);
+      }
+      inputInner.push(`<input${inputAttrs.join('')} />`);
+      if (props.loading) inputInner.push(`<span style="padding-right:${s.padding}px;display:flex;align-items:center;color:#9ca3af;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></span>`);
+      if (props.successState && !props.loading) inputInner.push(`<span style="padding-right:${s.padding}px;display:flex;align-items:center;color:#22c55e;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>`);
+      if (props.rightIcon && props.rightIcon !== 'none' && inputSvgMap[props.rightIcon] && !props.loading && !props.successState) {
+        inputInner.push(`<span style="padding-right:${s.padding}px;display:flex;align-items:center;color:#9ca3af;">${makeSvg(props.rightIcon)}</span>`);
+      }
+      if (props.rightAddon) inputInner.push(`<span style="padding:${s.padding}px;background:rgba(0,0,0,0.1);color:#9ca3af;border-left:1px solid ${s.borderColor}33;">${props.rightAddon}</span>`);
+
+      children.push(inputInner.join('\n  '));
+
+      // Error / helper
+      if (props.errorState && props.errorMessage) {
+        children.push(`<p style="font-size:12px;color:#ef4444;margin:4px 0 0;">${props.errorMessage}</p>`);
+      } else if (props.helperText) {
+        children.push(`<p style="font-size:12px;color:#9ca3af;margin:4px 0 0;">${props.helperText}</p>`);
+      }
+      if (props.charCount) {
+        children.push(`<span style="font-size:11px;color:#9ca3af;text-align:right;display:block;">0/${props.maxLength || 100}</span>`);
+      }
+
+      return { tag: 'div', selfClosing: false, children: children.join('\n  '), attrs: '' };
+    }
     case 'badge':
       const badgeChildren = props.showDot 
         ? '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background-color:currentColor;margin-right:6px;"></span>Badge'

@@ -1,4 +1,5 @@
 export function mapBgColor(hex: string): string {
+  if (!hex) return 'bg-gray-500';
   const map: Record<string, string> = {
     '#6366f1': 'bg-indigo-500',
     '#3b82f6': 'bg-blue-500',
@@ -18,6 +19,7 @@ export function mapBgColor(hex: string): string {
 }
 
 export function mapTextColor(hex: string): string {
+  if (!hex) return 'text-gray-500';
   const map: Record<string, string> = {
     '#ffffff': 'text-white',
     '#000000': 'text-black',
@@ -88,6 +90,7 @@ export function mapFontSize(px: string): string {
 }
 
 export function mapBorderColor(hex: string): string {
+  if (!hex) return 'border-gray-500';
   const map: Record<string, string> = {
     '#6366f1': 'border-indigo-500',
     '#3b82f6': 'border-blue-500',

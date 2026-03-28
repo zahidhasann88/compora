@@ -3,7 +3,7 @@ import { buildCSSFromStyles, getComponentContent, cssObjectToString, capitalize 
 
 export function generateReactCSSModules(component: string, styles: Styles, variant: Variant, props: Record<string, any> = {}): string {
   const css = buildCSSFromStyles(styles, variant, component, props);
-  const { tag, selfClosing, children, attrs } = getComponentContent(component, props);
+  const { tag, selfClosing, children, attrs } = getComponentContent(component, props, styles);
   const componentName = capitalize(component);
 
   // Convert HTML attrs and inject JSX for SVG inline strings

@@ -88,7 +88,17 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
     // Defaults for specific components
     button: { disabled: false, text: 'Click me', loading: false, fullWidth: false, withIcon: false, icon: 'none', iconPosition: 'left', buttonType: 'button', onClickAction: 'console', ariaLabel: '', pillShape: false, shadowPreset: 'none', transition: true },
     card: { shadow: 'md' },
-    input: { disabled: false, placeholder: 'Type something...' },
+    input: {
+      inputVariant: 'outlined',
+      placeholderColor: '#71717a', focusRingColor: '#6366f1', labelColor: '#e4e4e7',
+      label: 'Label', placeholder: 'Enter text...', helperText: '', errorMessage: 'This field is required', defaultValue: '',
+      inputType: 'text',
+      disabled: false, readOnly: false, required: false, errorState: false, loading: false, successState: false,
+      leftIcon: 'none', rightIcon: 'none',
+      leftAddon: '', rightAddon: '', clearButton: false, charCount: false, maxLength: 100,
+      inputFontWeight: '400', textAlign: 'left',
+      ariaLabel: '', ariaDescribedBy: '', tabIndex: 0, autocomplete: 'off',
+    },
     badge: { showDot: false },
     modal: { backdrop: 'sm' },
     table: { striped: true, hoverable: true }
@@ -108,7 +118,17 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
     set({ styles: { ...defaultStyles }, variant: 'primary', componentProps: {
       button: { disabled: false, text: 'Click me', loading: false, fullWidth: false, withIcon: false, icon: 'none', iconPosition: 'left', buttonType: 'button', onClickAction: 'console', ariaLabel: '', pillShape: false, shadowPreset: 'none', transition: true },
       card: { shadow: 'md' },
-      input: { disabled: false, placeholder: 'Type something...' },
+      input: {
+        inputVariant: 'outlined',
+        placeholderColor: '#71717a', focusRingColor: '#6366f1', labelColor: '#e4e4e7',
+        label: 'Label', placeholder: 'Enter text...', helperText: '', errorMessage: 'This field is required', defaultValue: '',
+        inputType: 'text',
+        disabled: false, readOnly: false, required: false, errorState: false, loading: false, successState: false,
+        leftIcon: 'none', rightIcon: 'none',
+        leftAddon: '', rightAddon: '', clearButton: false, charCount: false, maxLength: 100,
+        inputFontWeight: '400', textAlign: 'left',
+        ariaLabel: '', ariaDescribedBy: '', tabIndex: 0, autocomplete: 'off',
+      },
       badge: { showDot: false },
       modal: { backdrop: 'sm' },
       table: { striped: true, hoverable: true }
