@@ -28,9 +28,27 @@ export function buildCSSFromStyles(styles: Styles, variant: Variant, component: 
         css['border'] = `2px solid ${styles.bgColor}`;
         break;
     }
-    if (props.disabled) {
-      css['opacity'] = '0.5';
+    if (props.disabled || props.loading) {
+      css['opacity'] = '0.7';
       css['cursor'] = 'not-allowed';
+      if (variant === 'outline') {
+        css['background-color'] = 'transparent';
+        css['color'] = '#9ca3af';
+        css['border-color'] = '#d1d5db';
+      } else {
+        css['background-color'] = '#f3f4f6';
+        css['color'] = '#9ca3af';
+        css['border-color'] = '#f3f4f6';
+      }
+    }
+    if (props.fullWidth) {
+      css['width'] = '100%';
+    }
+    if (props.loading || props.withIcon) {
+      css['display'] = 'flex';
+      css['align-items'] = 'center';
+      css['justify-content'] = 'center';
+      css['gap'] = '8px';
     }
   } else if (component === 'card') {
     css['max-width'] = '320px';
@@ -186,7 +204,15 @@ export function getComponentContent(component: string, props: Record<string, any
 
   switch (component) {
     case 'button':
-      return { tag: 'button', selfClosing: false, children: props.text || 'Click me', attrs: disabledAttr };
+      const btnIsDisabled = props.disabled || props.loading;
+      const btnAttr = btnIsDisabled ? ' disabled' : '';
+      let btnChildren = props.text || 'Click me';
+      if (props.loading) {
+        btnChildren = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>\n  ${btnChildren}`;
+      } else if (props.withIcon) {
+        btnChildren = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>\n  ${btnChildren}`;
+      }
+      return { tag: 'button', selfClosing: false, children: btnChildren, attrs: btnAttr };
     case 'card':
       return { tag: 'div', selfClosing: false, children: '<h3>Card Title</h3>\n  <p>This is a description for the card component.</p>', attrs: '' };
     case 'input':

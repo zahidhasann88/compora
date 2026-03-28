@@ -68,7 +68,7 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
   variant: 'primary',
   componentProps: {
     // Defaults for specific components
-    button: { disabled: false, text: 'Click me' },
+    button: { disabled: false, text: 'Click me', loading: false, fullWidth: false, withIcon: false },
     card: { shadow: 'md' },
     input: { disabled: false, placeholder: 'Type something...' },
     badge: { showDot: false },
@@ -88,7 +88,7 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
   resetStyles: () => {
     get().saveHistory();
     set({ styles: { ...defaultStyles }, variant: 'primary', componentProps: {
-      button: { disabled: false, text: 'Click me' },
+      button: { disabled: false, text: 'Click me', loading: false, fullWidth: false, withIcon: false },
       card: { shadow: 'md' },
       input: { disabled: false, placeholder: 'Type something...' },
       badge: { showDot: false },
