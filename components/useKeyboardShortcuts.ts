@@ -51,6 +51,17 @@ export function useKeyboardShortcuts() {
         document.getElementById('save-btn')?.click();
         return;
       }
+
+      // Focus sidemenu search: `/`
+      if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        const search = document.getElementById('component-search') as HTMLInputElement | null;
+        if (search) {
+          e.preventDefault();
+          search.focus();
+          search.select();
+        }
+        return;
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);

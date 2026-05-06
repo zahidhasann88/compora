@@ -10,11 +10,11 @@ import CodePanel from '@/components/CodePanel';
 import ThemeToggle from '@/components/ThemeToggle';
 import ActionBar from '@/components/ActionBar';
 import { useKeyboardShortcuts } from '@/components/useKeyboardShortcuts';
-import { Layers } from 'lucide-react';
+import { Layers, ChevronRight } from 'lucide-react';
 
 function PlaygroundContent() {
   const searchParams = useSearchParams();
-  const { loadFromParams, loadFromLocalStorage } = usePlaygroundStore();
+  const { loadFromParams, loadFromLocalStorage, selectedComponent } = usePlaygroundStore();
 
   // Initialize keyboard shortcuts
   useKeyboardShortcuts();
@@ -97,13 +97,19 @@ function PlaygroundContent() {
     <div className="min-h-screen flex flex-col animate-fade-in h-screen overflow-hidden">
       {/* ── Header ── */}
       <header className="min-h-[64px] flex-shrink-0 border-b border-border flex flex-wrap items-center justify-between px-4 lg:px-6 py-3 gap-4 bg-surface/50 backdrop-blur-md z-50">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-accent/10">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="p-2 rounded-lg bg-accent/10 flex-shrink-0">
             <Layers size={20} className="text-accent" />
           </div>
-          <div>
+          <div className="min-w-0">
             <h1 className="text-sm font-bold gradient-text whitespace-nowrap">Compora</h1>
-            <p className="text-xs text-muted hidden sm:block">Visual UI Builder</p>
+            <div className="hidden sm:flex items-center gap-1 text-xs text-muted leading-tight">
+              <span>Visual UI Builder</span>
+              <ChevronRight size={12} className="opacity-50" />
+              <span className="text-foreground/80 capitalize font-medium truncate">
+                {selectedComponent}
+              </span>
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-2 lg:gap-3 overflow-x-auto pb-1 lg:pb-0 hide-scrollbar">

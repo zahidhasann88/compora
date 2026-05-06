@@ -42,6 +42,7 @@ interface PlaygroundState {
   theme: 'light' | 'dark';
   past: HistoryState[];
   future: HistoryState[];
+  recentComponents: ComponentType[];
 
   setComponent: (component: ComponentType) => void;
   updateStyle: (key: keyof Styles, value: string) => void;
@@ -130,6 +131,7 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
   theme: 'dark',
   past: [],
   future: [],
+  recentComponents: [],
   setPreviewBg: (bg) => set({ previewBg: bg }),
   codeFormat: 'jsx-tailwind',
 
@@ -224,7 +226,14 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
 
   setComponent: (component) => {
     get().saveHistory();
-    set({ selectedComponent: component });
+    const { recentComponents } = get();
+    const nextRecent = [component, ...recentComponents.filter((c) => c !== component)].slice(0, 5);
+    set({ selectedComponent: component, recentComponents: nextRecent });
+    try {
+      localStorage.setItem('playground-recent', JSON.stringify(nextRecent));
+    } catch {
+      // ignore storage errors
+    }
   },
 
   updateStyle: (key, value) => {
@@ -327,6 +336,13 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
           variant: parsed.variant,
           componentProps: parsed.componentProps || get().componentProps,
         });
+      }
+      const recent = localStorage.getItem('playground-recent');
+      if (recent) {
+        const parsedRecent = JSON.parse(recent);
+        if (Array.isArray(parsedRecent)) {
+          set({ recentComponents: parsedRecent });
+        }
       }
     } catch {
       // ignore parse errors
