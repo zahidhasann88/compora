@@ -22,6 +22,8 @@ function getAlertStyles(styles: Styles, variant: Variant, theme: 'light' | 'dark
       return { ...base, backgroundColor: styles.bgColor + '0d', color: textColor, border: 'none' };
     case 'outline':
       return { ...base, backgroundColor: 'transparent', color: textColor, border: `2px solid ${styles.bgColor}` };
+    default:
+      return { ...base, backgroundColor: styles.bgColor + '1a', color: textColor, border: 'none' };
   }
 }
 
