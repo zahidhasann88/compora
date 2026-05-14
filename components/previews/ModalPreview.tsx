@@ -19,6 +19,8 @@ function getModalStyles(styles: Styles, variant: Variant, theme: 'light' | 'dark
       return { ...base, backgroundColor: theme === 'dark' ? '#0f172a' : '#f8fafc', color: textColor };
     case 'outline':
       return { ...base, backgroundColor: theme === 'dark' ? '#020617' : '#ffffff', color: textColor, border: `2px solid ${styles.bgColor}` };
+    default:
+      return base;
   }
 }
 

@@ -25,6 +25,8 @@ function getToastStyles(styles: Styles, variant: Variant, theme: 'light' | 'dark
       return { ...base, backgroundColor: theme === 'dark' ? '#0f172a' : '#ffffff', color: textColor, border: `1px solid ${styles.bgColor}44` };
     case 'outline':
       return { ...base, backgroundColor: 'transparent', color: textColor, border: `2px solid ${styles.bgColor}` };
+    default:
+      return base;
   }
 }
 
