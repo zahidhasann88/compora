@@ -20,6 +20,9 @@ export function generateModalCode(styles: Styles, variant: Variant, props: Recor
     case 'outline':
       classes = `bg-white dark:bg-slate-950 border-2 ${mapBorderColor(styles.bgColor)} ${textColor} ${padding} ${radius}`;
       break;
+    default:
+      classes = `bg-white dark:bg-slate-950 ${textColor} ${padding} ${radius}`;
+      break;
   }
 
   const blurMap: Record<string, string> = {

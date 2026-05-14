@@ -19,6 +19,9 @@ export function generateToastCode(styles: Styles, variant: Variant): string {
     case 'outline':
       classes = `bg-transparent border-2 ${mapBorderColor(styles.bgColor)} ${textColor}`;
       break;
+    default:
+      classes = `${bg} text-white`;
+      break;
   }
 
   return `<div className="fixed bottom-4 right-4 ${classes} ${padding} ${radius} shadow-lg flex items-center gap-3 min-w-[300px] animate-in slide-in-from-bottom-5 z-50">

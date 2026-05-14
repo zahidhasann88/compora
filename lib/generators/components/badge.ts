@@ -21,6 +21,9 @@ export function generateBadgeCode(styles: Styles, variant: Variant, props: Recor
     case 'outline':
       classes = `bg-transparent ${mapTextColor(styles.bgColor)} border-2 ${mapBorderColor(styles.bgColor)} ${padding} ${radius} ${fontSize} font-semibold inline-flex items-center justify-center transition-colors gap-1.5`;
       break;
+    default:
+      classes = `${mapBgColor(styles.bgColor)} ${mapTextColor(styles.textColor)} ${padding} ${radius} ${fontSize} font-semibold inline-flex items-center justify-center transition-colors gap-1.5`;
+      break;
   }
 
   if (props.showDot) {

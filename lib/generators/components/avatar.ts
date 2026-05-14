@@ -19,6 +19,9 @@ export function generateAvatarCode(styles: Styles, variant: Variant): string {
     case 'outline':
       classes = `bg-transparent ${mapTextColor(styles.bgColor)} border-2 ${mapBorderColor(styles.bgColor)} ${radius} ${fontSize} font-semibold inline-flex items-center justify-center w-12 h-12 uppercase shrink-0 transition-colors`;
       break;
+    default:
+      classes = `${mapBgColor(styles.bgColor)} ${mapTextColor(styles.textColor)} ${radius} ${fontSize} font-semibold inline-flex items-center justify-center w-12 h-12 uppercase shrink-0 transition-colors`;
+      break;
   }
 
   return `<div className="${classes}">\n  AB\n</div>`;

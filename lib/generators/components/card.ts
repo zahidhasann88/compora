@@ -29,6 +29,9 @@ export function generateCardCode(styles: Styles, variant: Variant, props: Record
     case 'outline':
       classes = `bg-transparent ${textColor} border-2 ${mapBorderColor(styles.bgColor)} ${padding} ${radius} ${fontSize}${shadow}`;
       break;
+    default:
+      classes = `${mapBgColor(styles.bgColor)}/10 ${textColor} ${padding} ${radius} ${fontSize}${shadow}`;
+      break;
   }
 
   const descClass = isWhiteText ? 'text-slate-600 dark:text-slate-400' : 'opacity-80';

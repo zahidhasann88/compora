@@ -20,6 +20,9 @@ export function generateAlertCode(styles: Styles, variant: Variant): string {
     case 'outline':
       classes = `bg-transparent border-2 ${mapBorderColor(styles.bgColor)} ${textColor} ${padding} ${radius} ${fontSize} flex gap-4 w-full`;
       break;
+    default:
+      classes = `${mapBgColor(styles.bgColor)}/10 ${textColor} ${padding} ${radius} ${fontSize} flex gap-4 w-full`;
+      break;
   }
 
   const descClass = isWhiteText ? 'text-slate-600 dark:text-slate-400' : 'opacity-80';
