@@ -24,6 +24,8 @@ function getAvatarStyles(styles: Styles, variant: Variant, theme: 'light' | 'dar
       return { ...base, backgroundColor: styles.bgColor + '33', color: textColor };
     case 'outline':
       return { ...base, backgroundColor: 'transparent', color: textColor, border: `2px solid ${styles.bgColor}` };
+    default:
+      return base;
   }
 }
 
